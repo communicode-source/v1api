@@ -3,6 +3,27 @@
   "version": "1.0.0",
   "description": "Communicode API Official",
   "main": "server.js",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "~1.0.1",
+    "connect-ensure-login": "^0.1.1",
+    "connect-redis": "^3.2.0",
+    "express": "~4.8.0",
+    "express-session": "^1.15.0",
+    "jsonwebtoken": "^7.3.0",
+    "jwt-simple": "^0.5.1",
+    "mongoose": "~4.8.2",
+    "morgan": "*",
+    "nodemailer": "^3.0.2",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
+    "passport-github": "^1.1.0",
+    "passport-google-oauth2": "^0.1.6",
+    "passport-local": "^1.0.0",
+    "redis": "^2.6.5",
+    "sanitizer": "^0.1.3",
+    "twig": "*"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
