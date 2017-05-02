@@ -1,0 +1,23 @@
+{
+  "name": "communicode",
+  "version": "1.0.0",
+  "description": "Communicode API Official",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/communicode-source/v1api.git"
+  },
+  "keywords": [
+    "api"
+  ],
+  "author": "Communicode",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/communicode-source/v1api/issues"
+  },
+  "homepage": "https://github.com/communicode-source/v1api#readme"
+}
