@@ -21,19 +21,19 @@
 [Installing Mongod](https://docs.mongodb.com/manual/installation/)
 
 To get started clone this repository
-'''
+```
 git clone https://github.com/communicode-source/v1api.git
-'''
+```
 
 Then, run these commands
-'''
+```
 npm install
 npm install -g nodemon
-'''
+```
 
 *Note, to install nodemon globally, you will need admin or root rights.
 
 Finally, to start the server, run
-'''
+```
 nodemon server.js
-'''
+```
