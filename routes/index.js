@@ -4,7 +4,7 @@ const jwt           = require('./jwt');
 const routes = {
   '/'     : test,
   '/test' : test,
-  '/jwt'  : jwt,
+  '/jwt'  : jwt
 }
 
 module.exports = (app) => {

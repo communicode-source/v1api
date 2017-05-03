@@ -1,10 +1,12 @@
-const controller = require('./../../controller/test');
 const router     = require('express').Router();
+
+// Require the TestController
+const controller = require('./../../controller/test');
 
 router.route('/')
 
   .get((req, res) => {
-    let test = controller.index(req, res).next().value;
+    const test = controller.index(req, res).next().value;
 
     test.then((result) => {
       res.status(200).json(result);
