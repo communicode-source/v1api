@@ -1,14 +1,11 @@
 const test          = require('./test');
 const jwt           = require('./jwt');
 
-const routes        = {
+const routes = {
   '/'     : test,
   '/test' : test,
   '/jwt'  : jwt,
 }
-
-
-
 
 module.exports = (app) => {
   for(let i in routes) {

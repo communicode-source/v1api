@@ -1,11 +1,14 @@
-const handler   = require('./../../db/handler/test');
+'use strict'
 
-module.exports = {
-  returnTestData:  function() {
-    return new Promise((res, rej) => {
-      handler.readAll().then((results) => {
-        return res(results);
-      });
-    })
+const TestDBHandler = require('./../../db/handler/test');
+
+class TestController {
+
+  *index(req, res) {
+    let dbHandler = new TestDBHandler();
+    yield *dbHandler.findAll();
   }
+
 }
+
+module.exports = new TestController();
