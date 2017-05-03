@@ -2,11 +2,13 @@
 
 **Please follow all instructions regarding comments and naming conventions.**
 
-** _Dependencies you will need!_**
-- Mongo
-- Redis-CLI / Redis-Server
-- Node and npm
+**
+_Dependencies you will need!_
+**
 - Git
+- Node and npm
+- Redis-CLI / Redis-Server
+- Mongo
 
 ## To download Git:
 [Install Github](https://help.github.com/desktop/guides/getting-started/installing-github-desktop)
@@ -35,5 +37,5 @@ npm install -g nodemon
 
 Finally, to start the server, run
 ```
-nodemon server.js
+nodemon bin/server.js
 ```
