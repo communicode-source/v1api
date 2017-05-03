@@ -3,7 +3,9 @@ const router     = require('express').Router();
 
 router.route('/')
   .get((req, res) => {
-    res.status(200).json(controller());
+    controller.returnTestData().then((results) => {
+      res.status(200).json(results);
+    })
   })
 
 

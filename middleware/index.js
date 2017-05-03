@@ -1,6 +1,6 @@
 const logger     = require('morgan');
 const bodyParser = require('body-parser');
-
+const mongo      = require('./mongo');
 
 module.exports = (app) => {
 
@@ -12,5 +12,6 @@ module.exports = (app) => {
 
   app.use(logger('dev'));
 
+  mongo();
 
 }
