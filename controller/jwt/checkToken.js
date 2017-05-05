@@ -1,30 +1,40 @@
+'use strict'
+/**
+* Last Date Updated: 05.04.17
+* @name controller/jwt/checkToken
+* @author Cooper Campbell
+* This routes the home api route '/'.
+* This depends on the jsonwebtoken.
+**/
 const jwt = require('jsonwebtoken');
 
-
-// Returns the decoded JWT if there is no error.
-const ensureTokenAuthentic = (token) => {
-  try {
-    const decode = jwt.verify(token, require('./../../config/auth.json').token);
-
-    const valid = checkRules(decode);
-
-    return (valid.err === true) ? valid : {err: false, msg: decode};
-
-
-  } catch(e) {
-    if(e) {
-      return {err: true, msg: "Incorrect signature"};
-    }
+class jwtClass {
+  /**
+  * ensureTokenAuthentic jwtClass - Logic for determining the validity of a token and decoding.
+  * @param type - this is either 0 or 1, 0 for just decoding and 1 for verifying and decoding.
+  * @return A JSON containing the payload or an error msg.
+  **/
+  *ensureTokenAuthentic(type, token) {
+    if(type === 0)
+      return {err: false, msg: jwt.decode(token)};
+    let bundle = yield jwt.verify(token, require('./../../config/auth.json').token);
+    return checkRules(bundle[0], bundle[1]);
   }
 }
 
-// Checks for implicit rules decided by us.
-const checkRules = (payload) => {
+/**
+* This is a private function used to check the rules that we have set in place
+*   I.E. Checking the expiration date to make sure that the expiration date is not passed,
+**    or checking the IP to make sure it originated from the same user.
+**/
+const checkRules = (payload, request) => {
   if(payload.exp < new Date().getTime()) {
     return {err: true, msg: 'JWT has expired'};
   }
-
-  return {err: false};
+  if(request.connection.remoteAddress !== payload.location) {
+    return {err: true, msg: 'Request did not come from same origin'};
+  }
+  return {err: false, msg: payload};
 }
 
-module.exports = ensureTokenAuthentic;
+module.exports = jwtClass;

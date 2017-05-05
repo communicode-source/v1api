@@ -9,90 +9,6 @@ const token             = require('./../middleware/genToken').returnKeytoken;
 const t                 = require('./../handlers/User');
 const UserModel         = new t();
 
-// Repeated function for finding the user in the database.
-const findOrCreateUser = function(profile, done) {
-  User.findOne({ // Sees if user is already in DB.
-    'Provider'         : profile.provider,
-    'providerID'       : profile.id,
-    'email'            : profile.email
-  }, function(err, user){
-    if(err){ // Return if there is an error.
-      console.log(err);
-      return done(err, null);
-    }
-    if(user){ // Return an existing user if there is one.
-      return done(null, user);
-    } else { // Make that new user.
-      newUser = new User({
-        email: profile.email,
-        fName: profile.fname,
-        lName: profile.lname,
-        providerID: profile.id,
-        accountType: false,
-        nonprofitType: null,
-        interests: [],
-        skills: [],
-        Provider: profile.provider,
-        }
-      );
-      newUser.save(function(err) { // Save that new user.
-        if(err){
-          console.log(err);
-        }
-        console.log(newUser);
-        return done(null, newUser);
-      });
-    }
-  });
-}
-// Function to create a user in the local database.
-const createLocalUser = function(req, email, password, accountType, done) {
-  User.findOne({'email': email}, function(err, user) {
-
-    if(err)
-      return done(err);
-    if(user) {
-      return done(null, false);
-    } else {
-      var newUser = new User(); // Create a new user schema.
-      newUser.Provider = 'local'; // Weird syntax for declaring the fields of the user.
-      newUser.email = email;
-      newUser.accountType = accountType;
-      newUser.fName = req.body.fname ? req.body.fname : null;
-      newUser.lName = req.body.lname ? req.body.lname : null;
-      newUser.skills = [];
-      newUser.interests = [];
-      newUser.nonprofitType = null;
-      newUser.providerID = null;
-      newUser.password = newUser.generateHash(password); // This is why the weird syntax seems necessary.
-
-      newUser.save(function(err){ // Save the user.
-        if(err)
-          throw err;
-        return done(null, newUser);
-      });
-    }
-  });
-}
-
-// Function to log in the current user in the lcoal database.
-const logInCurrentUser = function(email, password, done) {
-  User.findOne({'email': email}, function(err, user) { // Finding the user.
-    if(err)
-      throw new err;
-    if(!user){ // Makes sure the user exists.
-      return done(null, false);
-    }
-    if(user.Provider != 'local') // Make sure the email comes from a local user.
-      return done(null, false);
-    if(!user.validPassword(password)) // Validate password.
-      return done(null, false);
-
-    return done(null, user); // Return the user.
-  });
-}
-
-
 // Initialize with the passport instance to configure passport to run properly.
 module.exports = function(passport) {
 
@@ -175,22 +91,7 @@ module.exports = function(passport) {
     // =========================================================================
     passport.use('local-signup-dev', new LocalStrategy({
       usernameField: 'email', // Changes the default from 'username' to 'email.'
-      /**
-      *
-      * THIS IS THE DUMBEST THING EVER. SINCE WHEN DID HAVING A SPACE AFTER THE KEY
-      *      TO A JSON OBJECT ACTUALLY AFFECT THE GOSH DANG VALUE. JAVASCRIPT IS NOT
-      *      A FLIPPING WHITE SPACE LANGUAGE. THIS SHOULD NOT BE A PROBLEM. WHY DO
-      *      OTHER THINGS WORK FINE WITHOUT THE SPACE? HOW DO YOU EVEN ACCOMPLISH
-      *      MAKING SUCH A THING ILLEGAL WHEN IT REALLY ISN'T?!?!?! CRAP.
-      *             -- Cooper <(2/10/17)
-      *
-      **/
-      passReqToCallback: true // AWFUL. RUN. AS FAR AWAY AS YOU CAN. 0/10. NEVER RECOMMEND.
-      /**
-      * WHAT THE ****. NOW IT WORKS? TREVORE CRUPI CAN VOUCH IT WASN'T WORKING BEFORE.
-      *      THIS IS A LOAD OF CRAP. SCREW THIS. INCONSISTENCY REIGNS SUPREME IN JAVASCRIPT APPARENTLY.
-      *             -- Cooper (2/10/17)
-      **/
+      passReqToCallback: true 
     },
       function(req, email, password, done){
         process.nextTick(function() { // Async.
@@ -201,22 +102,7 @@ module.exports = function(passport) {
 
     passport.use('local-signup-nonprofit', new LocalStrategy({
       usernameField: 'email', // Changes the default from 'username' to 'email.'
-      /**
-      *
-      * THIS IS THE DUMBEST THING EVER. SINCE WHEN DID HAVING A SPACE AFTER THE KEY
-      *      TO A JSON OBJECT ACTUALLY AFFECT THE GOSH DANG VALUE. JAVASCRIPT IS NOT
-      *      A FLIPPING WHITE SPACE LANGUAGE. THIS SHOULD NOT BE A PROBLEM. WHY DO
-      *      OTHER THINGS WORK FINE WITHOUT THE SPACE? HOW DO YOU EVEN ACCOMPLISH
-      *      MAKING SUCH A THING ILLEGAL WHEN IT REALLY ISN'T?!?!?! CRAP.
-      *             -- Cooper <(2/10/17)
-      *
-      **/
-      passReqToCallback: true // AWFUL. RUN. AS FAR AWAY AS YOU CAN. 0/10. NEVER RECOMMEND.
-      /**
-      * WHAT THE ****. NOW IT WORKS? TREVORE CRUPI CAN VOUCH IT WASN'T WORKING BEFORE.
-      *      THIS IS A LOAD OF CRAP. SCREW THIS. INCONSISTENCY REIGNS SUPREME IN JAVASCRIPT APPARENTLY.
-      *             -- Cooper (2/10/17)
-      **/
+      passReqToCallback: true
     },
       function(req, email, password, done){
         process.nextTick(function() { // Async.

@@ -1,8 +1,13 @@
-const test          = require('./test');
+/**
+* List the objects of the routers here in alphabetical order please.
+* Also space them so that the = always starts on the same column.
+**/
+const home          = require('./home');
 const jwt           = require('./jwt');
+const test          = require('./test');
 
 const routes = {
-  '/'     : test,
+  '/'     : home,
   '/test' : test,
   '/jwt'  : jwt
 }
