@@ -1,6 +1,9 @@
-const logger     = require('morgan');
-const bodyParser = require('body-parser');
-const mongo      = require('./mongo');
+const bodyParser           = require('body-parser');
+const logger               = require('morgan');
+const passport             = require('passport');
+
+const mongo                = require('./mongo');
+const passportMiddleware   = require('./passport');
 
 module.exports = (app) => {
 
@@ -13,5 +16,8 @@ module.exports = (app) => {
   app.use(logger('dev'));
 
   mongo();
+
+  // Mongo middleware must come before.
+  passportMiddleware(passport);
 
 }

@@ -2,11 +2,9 @@ const FacebookStrategy  = require('passport-facebook').Strategy; // Allows for F
 const GithubStrategy    = require('passport-github').Strategy; // Allowws for Github validation.
 const GoogleStrategy    = require('passport-google-oauth2').Strategy;
 const LocalStrategy     = require('passport-local').Strategy; // Allows for custom local validation.
-const auth              = require('./auth.json'); // Super secret sauces.
-var User                = require('./../models/User'); // User model.
-const newUserEmail      = require('./../middleware/email').newUserEmail;
-const token             = require('./../middleware/genToken').returnKeytoken;
-const t                 = require('./../handlers/User');
+const auth              = require('./../../config/auth.json'); // Super secret sauces.
+var User                = require('./../../db/model/user'); // User model.
+const t                 = require('./../../db/handler/user');
 const UserModel         = new t();
 
 // Initialize with the passport instance to configure passport to run properly.
@@ -91,7 +89,7 @@ module.exports = function(passport) {
     // =========================================================================
     passport.use('local-signup-dev', new LocalStrategy({
       usernameField: 'email', // Changes the default from 'username' to 'email.'
-      passReqToCallback: true 
+      passReqToCallback: true
     },
       function(req, email, password, done){
         process.nextTick(function() { // Async.
