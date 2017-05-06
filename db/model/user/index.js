@@ -1,13 +1,20 @@
-// Refer to ../../server.js
-var mongoose = require("mongoose");
-var bcrypt   = require('bcrypt-nodejs');
-// Export the schema for the "Greeting" object.
-var User = mongoose.Schema({
-  email:             String,
-  accountType:       Boolean,
-  Provider:          String,
-  providerID:        String,
-  password:          String
+const bcrypt   = require('bcrypt-nodejs');
+const mongoose = require("mongoose");
+
+let User = mongoose.Schema({
+  email            : String,
+  accounttype      : Boolean,
+  provider         : String,
+  providerid       : String,
+  password         : String,
+  fname            : String,
+  lname            : String,
+  organizationname : String,
+  url              : String,
+  urlnum           : Number,
+  nonprofittype    : String,
+  skills           : Object,
+  interests        : Array,
 });
 User.methods.generateHash = function(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
