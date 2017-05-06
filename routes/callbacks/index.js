@@ -7,6 +7,7 @@ const passport = require('passport');
 **/
 router.route('/callback/facebook')
   .get(passport.authenticate('facebook', {
+        session: false,
         successRedirect : '/findPath',
         failureRedirect : '/'
     }));
@@ -16,6 +17,7 @@ router.route('/callback/facebook')
 **/
 router.route('/callback/github')
   .get(passport.authenticate('github', {
+    session: false,
     successRedirect: '/findPath',
     failureRedirect: '/'
   }));
@@ -25,6 +27,7 @@ router.route('/callback/github')
 **/
 router.route('/callback/google')
   .get(passport.authenticate('google', {
+    session: false,
     successRedirect: '/findPath',
     failureRedirect: '/'
   }));
@@ -34,16 +37,19 @@ router.route('/callback/google')
 **/
 router.route('/local/register/dev') // Register Route.
   .post(passport.authenticate('local-signup-dev', {
+      session: false,
       successRedirect : '/findPath',
       failureRedirect : '/'
   }));
 router.route('/local/register/nonprofit') // Register Route.
   .post(passport.authenticate('local-signup-nonprofit', {
+      session: false,
       successRedirect : '/findPath',
       failureRedirect : '/'
   }));
 router.route('/local/login') // Login Route.
   .post(passport.authenticate('local-login', {
+    session: false,
     successRedirect: '/findPath',
     failureRedirect: '/'
   }));

@@ -26,7 +26,7 @@ module.exports = function(passport) {
     passport.use(new FacebookStrategy({ // Using the facebook passport startegy to lgo people in.
         clientID        : auth.facebook.clientID, // Kittens.
         clientSecret    : auth.facebook.clientSecret, // Secret sauce.
-        callbackURL     : 'http://localhost:3000/oauth/facebook/login/callback', // URls
+        callbackURL     : 'http://127.0.0.1:3000/callback/facebook', // URls
         profileFields   : ['id', 'emails', 'name'] // Permissions.
     },
       function(token, refreshToken, profile, done){ // Annoying thing that took me forever to figure out how to use.
@@ -48,6 +48,7 @@ module.exports = function(passport) {
     passport.use(new GithubStrategy({
       clientID        : auth.github.clientID, // Meerkat.
       clientSecret    : auth.github.clientSecret, // Secret sauce.
+      callbackURL     : 'http://127.0.0.1:3000/callback/github',
       profileFields   : ['id', 'emails', 'name'] // Permissions.
       },
       function(token, refreshToken, profile, done) { // Annoying thing that took me forever to figure out how to use.
@@ -69,7 +70,7 @@ module.exports = function(passport) {
     passport.use(new GoogleStrategy({
       clientID      : auth.google.clientID,
       clientSecret  : auth.google.clientSecret,
-      callbackURL   : 'http://localhost:3000/oauth/google/login/callback',
+      callbackURL   : 'http://127.0.0.1:3000/callback/google',
       profileFields : ['id', 'emails', 'name']
     },
     function(token, refreshToken, profile, done) {
