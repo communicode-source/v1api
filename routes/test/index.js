@@ -1,9 +1,11 @@
 const router         = require('express').Router();
+const passport       = require('passport');
 
 // Require the TestController
 const controller     = require('./../../controller/test');
 const userController = require('./../../controller/user');
 const userHandler    = require('./../../db/handler/user');
+
 
 router.route('/')
 
