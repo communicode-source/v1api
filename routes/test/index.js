@@ -37,7 +37,8 @@ router.route('/user/update')
   router.route('/user/make')
       .post(passport.authenticate('local-signup-dev', {
           successRedirect : '/findPath',
-          failureRedirect : '/'
+          failureRedirect : '/',
+          session: false
       }));
       // const user = new userHandler();
       // const data = {

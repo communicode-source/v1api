@@ -1,4 +1,5 @@
 const bodyParser           = require('body-parser');
+const cors                 = require('cors');
 const logger               = require('morgan');
 const passport             = require('passport');
 
@@ -15,9 +16,11 @@ module.exports = (app) => {
 
   app.use(logger('dev'));
 
+  app.use(cors());
+
   mongo();
 
   // Mongo middleware must come before.
   passportMiddleware(passport);
-
+  app.use(passport.initialize());
 }

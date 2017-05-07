@@ -126,7 +126,8 @@ class User {
 
 
   setPassword(pw) {
-      this.user.password = userModel.generateHash(password);
+    let user = new userModel();
+      this.user.password = user.generateHash(pw);
       return this.user.password;
   }
 

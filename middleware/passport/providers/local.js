@@ -15,7 +15,7 @@ module.exports = (passport, userModel) => {
     },
       function(req, email, password, done) {
         process.nextTick(function() {
-          passportController.passportCreateLocalUser(req, email, password, i, done);
+          passportController.passportCreateLocalUser(req, email, password, done);
         });
       }
     ));

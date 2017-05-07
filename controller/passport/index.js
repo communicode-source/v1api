@@ -4,7 +4,7 @@ const userModel       = require('./../../db/model/user');
 const userHandler     = require('./../../db/handler/user');
 
 
-class Passport {
+module.exports = {
 
   passportFindOrCreate(profile, done) {
     userModel.findOne({ // Sees if user is already in DB.
@@ -35,7 +35,7 @@ class Passport {
           });
       }
     });
-  }
+  },
 
   passportCreateLocalUser(req, email, password, done) {
     userModel.findOne({'email': email, 'provider' : 'local'}, function(err, user) {
@@ -60,7 +60,7 @@ class Passport {
         });
       }
     });
-  }
+  },
 
   passportLogInCurrentUser(email, password, done) {
     userModel.findOne({'email': email, 'provider' : 'local'}, function(err, user) { // Finding the user.
@@ -78,5 +78,3 @@ class Passport {
 
 
 }
-
-module.exports = Passport;

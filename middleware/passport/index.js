@@ -7,6 +7,7 @@ const googleStrategy   = require('./providers/google');
 const localStrategy    = require('./providers/local');
 
 module.exports = (passport) => {
+  passport.initialize();
   facebookStrategy(passport, userHandler);
   githubStrategy(passport, userHandler);
   googleStrategy(passport, userHandler);
