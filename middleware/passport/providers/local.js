@@ -1,7 +1,7 @@
 const LocalStrategy     = require('passport-local').Strategy;
 
 
-
+const passportController = require('./../../../controller/passport');
 const auth              = require('./../../../config/auth.json');
 
 
@@ -15,7 +15,7 @@ module.exports = (passport, userModel) => {
     },
       function(req, email, password, done) {
         process.nextTick(function() {
-          UserModel.passportCreateLocalUser(req, email, password, i, done);
+          passportController.passportCreateLocalUser(req, email, password, i, done);
         });
       }
     ));
@@ -26,7 +26,7 @@ module.exports = (passport, userModel) => {
   },
   function(email, password, done) {
     process.nextTick(function() {
-      UserModel.passportLogInCurrentUser(email, password, done);
+      passportController.passportLogInCurrentUser(email, password, done);
     });
   }));
 }

@@ -3,6 +3,7 @@ const router         = require('express').Router();
 // Require the TestController
 const controller     = require('./../../controller/test');
 const userController = require('./../../controller/user');
+const userHandler    = require('./../../db/handler/user');
 
 router.route('/')
 
@@ -18,17 +19,33 @@ router.route('/')
   });
 
 
-router.route('/user')
+router.route('/user/update')
   .get((req, res) => {
 
     const user = new userController();
 
-    user.updateUser({_id: '590dfda407ee927c59fb92771'}, {fname: 'Cooper', lname: 'Campbell'}).then((json) => {
+    user.updateUser({_id: '590e9217244bee4765736b82'}, {fname: 'Cooper', lname: 'Campbell'}).then((json) => {
       res.status(200).json(json);
     }).catch((errJSON) => {
-      res.status(200).json(errJSON);
+      res.status(500).json(errJSON);
     });
 
   });
+
+  router.route('/user/make')
+    .get((req, res) => {
+
+      const user = new userHandler();
+
+      user.createUser({email: 'cooper.campbell104@gmail.com', provider: 'local'}).then(newUser => {
+        res.status(200).json(newUser);
+        user.cleanup(true);
+      }).catch(error => {
+        res.status(500).json({err: true, name: err.name, msg: err.message});
+        user.cleanup(true);
+      });
+
+
+    });
 
 module.exports = router;

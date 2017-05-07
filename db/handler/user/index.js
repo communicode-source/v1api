@@ -9,7 +9,7 @@ mongoose.Promise  = require('bluebird');
 class User {
 
   constructor() {
-    this.user             = null;
+    this.user             = {};
     this.ready            = false;
     this.fields           = ['_id',
                               'email',
@@ -29,6 +29,32 @@ class User {
     this.modified         = [];
     this.update           = {};
     this.prepFail         = null;
+  }
+
+  createUser(data) {
+    return new Promise((resolve, reject) => {
+      this.user = libs.lCaseIndex(data);
+      if(this.user.fname && this.user.lname) {
+        const fname = this.user.fname.toLowerCase();
+        const lname = this.user.lname.toLowerCase();
+        libs.updateUrl(fname, lname)
+        .then((results) => {
+          const number = libs.getUrlNumber(results);
+          this.user.url = fname+"."+lname+number.toString();
+          this.user.urlnum = number;
+          const newUser = new userModel(this.user);
+          newUser.save();
+          return resolve(newUser);
+        }).catch((err) => {
+          console.log(err);
+          return reject(err);
+        });
+      } else {
+        const newUser = new userModel(this.user);
+        newUser.save();
+        return resolve(newUser);
+      }
+    });
   }
 
   addQuery(json) {
@@ -98,6 +124,12 @@ class User {
     yield userModel.find(this.query).exec();
   }
 
+
+  setPassword(pw) {
+      this.user.password = userModel.generateHash(password);
+      return this;
+  }
+
   cleanup(extent) {
     this.ready = false;
     this.query            = {};
@@ -105,51 +137,8 @@ class User {
     this.update           = {};
     this.prepFail         = null;
     if(extent)
-      this.user = null;
-  }
-
-  /**
-   * Updates User Attributes
-   * @param data - object of attributes to update
-   * @param id - ID of user
-   * @param callback - Callback function
-  **/
-  updateOrganizationAndUrl(data, id, callback) {
-    var modified = {};
-
-    if(!this.isLoggedIn) {
-      callback('No logged in user', null);
-    }
-
-    userAttr.findOne({userId: id}, function(err, user) {
-      if(err)
-        callback(err, null);
-
-      user.organizationName = data.organizationName;
-      user.url = data.organizationName.replace(/\s+/g, '').toLowerCase();
-
-      if(user.organizationName !== null) {
-        modified.organizationName = null;
-      }
-
-      if(user.url !== null) {
-        modified.url = null;
-      }
-
-
-      if(modified.url) {
-        process.nextTick(() => {
-          user.url = data.organizationName.replace(/\s+/g, '').toLowerCase();
-        });
-        modified['url'] = null;
-      } else {
-        user.save();
-      }
-
-      if(user.save())
-        callback(null, "Updated Successfully");
-    });
-
+      this.user = {};
+    return this;
   }
 
 }

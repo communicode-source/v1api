@@ -2,19 +2,20 @@ const bcrypt   = require('bcrypt-nodejs');
 const mongoose = require("mongoose");
 
 let User = mongoose.Schema({
-  email            : String,
-  accounttype      : Boolean,
-  provider         : String,
-  providerid       : String,
-  password         : String,
-  fname            : String,
-  lname            : String,
-  organizationname : String,
-  url              : String,
-  urlnum           : Number,
-  nonprofittype    : String,
-  skills           : Object,
-  interests        : Array,
+  accounttype      : {type: Boolean, default:     null},
+  datejoined       : {type: Date,    default: Date.now},
+  email            : {type: String,  required:    true},
+  fname            : {type: String,  default:     null},
+  interests        : {type: Array,   default:       []},
+  lname            : {type: String,  default:     null},
+  nonprofittype    : {type: String,  default:     null},
+  organizationname : {type: String,  default:     null},
+  password         : {type: String,  default:     null},
+  provider         : {type: String,  required:    true},
+  providerid       : {type: String,  default:     null},
+  skills           : {type: Object,  default:       {}},
+  url              : {type: String,  default:     null},
+  urlnum           : {type: Number,  default:     null}
 });
 User.methods.generateHash = function(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);

@@ -50,7 +50,7 @@ class User {
             });
           }
         }, (err) => {
-          reject({err: true, msg: err.message});
+          reject({err: true, name: err.name, msg: err.message});
         }
       );
 

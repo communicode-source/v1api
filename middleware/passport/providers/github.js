@@ -1,7 +1,7 @@
 // Passport plugin to add the github authentication strategy.
 const GithubStrategy    = require('passport-github').Strategy;
 
-
+const passportController = require('./../../../controller/passport');
 const auth              = require('./../../../config/auth.json');
 
 module.exports = (passport, userModel) => {
@@ -20,7 +20,7 @@ module.exports = (passport, userModel) => {
           "email": profile._json.email
         };
 
-        UserModel.passportFindOrCreate(user, done);
+        passportController.passportFindOrCreate(user, done);
       });
     }));
 }

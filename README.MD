@@ -38,7 +38,7 @@ Note, to install nodemon globally, you will need admin or root rights.
 
 Finally, to start the server, run
 ```
-nodemon bin/server.js
+npm run dev
 ```
 
 

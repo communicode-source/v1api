@@ -1,7 +1,7 @@
 // Passport plugin to add the google authentication strategy.
 const GoogleStrategy    = require('passport-google-oauth2').Strategy;
 
-
+const passportController = require('./../../../controller/passport');
 const auth              = require('./../../../config/auth.json');
 
 module.exports = (passport, userModel) => {
@@ -20,7 +20,7 @@ module.exports = (passport, userModel) => {
           "email": profile.email
         };
 
-        userModel.passportFindOrCreate(user, done);
+        passportController.passportFindOrCreate(user, done);
       });
     }));
 }
