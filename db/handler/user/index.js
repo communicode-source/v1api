@@ -127,7 +127,7 @@ class User {
 
   setPassword(pw) {
       this.user.password = userModel.generateHash(password);
-      return this;
+      return this.user.password;
   }
 
   cleanup(extent) {

@@ -20,7 +20,7 @@ router.route('/')
 
 
 router.route('/user/update')
-  .get((req, res) => {
+  .post((req, res) => {
 
     const user = new userController();
 
@@ -33,19 +33,23 @@ router.route('/user/update')
   });
 
   router.route('/user/make')
-    .get((req, res) => {
+      .post(passport.authenticate('local-signup-dev', {
+          successRedirect : '/findPath',
+          failureRedirect : '/'
+      }));
+      // const user = new userHandler();
+      // const data = {
+      //   provider: 'local',
+      //   email: req.body.email,
+      //   password: req.body.email
+      // }
+      // user.createUser({email: 'cooper.campbell104@gmail.com', provider: 'local'}).then(newUser => {
+      //   res.status(200).json(newUser);
+      //   user.cleanup(true);
+      // }).catch(error => {
+      //   res.status(500).json({err: true, name: err.name, msg: err.message});
+      //   user.cleanup(true);
+      // });
 
-      const user = new userHandler();
-
-      user.createUser({email: 'cooper.campbell104@gmail.com', provider: 'local'}).then(newUser => {
-        res.status(200).json(newUser);
-        user.cleanup(true);
-      }).catch(error => {
-        res.status(500).json({err: true, name: err.name, msg: err.message});
-        user.cleanup(true);
-      });
-
-
-    });
 
 module.exports = router;

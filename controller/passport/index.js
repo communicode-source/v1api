@@ -37,7 +37,7 @@ class Passport {
     });
   }
 
-  passportCreateLocalUser(req, email, password, accountType, done) {
+  passportCreateLocalUser(req, email, password, done) {
     userModel.findOne({'email': email, 'provider' : 'local'}, function(err, user) {
       if(err)
         return done(err);
@@ -48,11 +48,12 @@ class Passport {
         const data = {
           provider: 'local',
           email: email,
-          accounttype: accountType,
+          accounttype: (req.accounttype) ? req.accounttype : 0,
           providerid: null,
+          password: newUser.setPassword(password),
         }
-        newUser.setPassword(password).createUser(data).then(newUser => {
-          return done(null, newUser);
+        newUser.createUser(data).then(newUserC => {
+          return done(null, newUserC);
         }).catch(err => {
           console.log(err);
           return done(err, newUser);
