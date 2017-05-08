@@ -2,11 +2,11 @@
 
 const mongoose    = require('mongoose');
 const libs        = require('./lib');
-const userModel   = require('./../../model/user');
+const User        = require('./../../model/user');
 mongoose.Promise  = require('bluebird');
 
 
-class User {
+class UserHandler {
 
   constructor() {
     this.user             = {};
@@ -31,6 +31,10 @@ class User {
     this.prepFail         = null;
   }
 
+  find(query) {
+    return User.findOne(query).exec();
+  }
+
   createUser(data) {
     return new Promise((resolve, reject) => {
       this.user = libs.lCaseIndex(data);
@@ -42,7 +46,7 @@ class User {
           const number = libs.getUrlNumber(results);
           this.user.url = fname+"."+lname+number.toString();
           this.user.urlnum = number;
-          const newUser = new userModel(this.user);
+          const newUser = new User(this.user);
           newUser.save();
           return resolve(newUser);
         }).catch((err) => {
@@ -50,7 +54,7 @@ class User {
           return reject(err);
         });
       } else {
-        const newUser = new userModel(this.user);
+        const newUser = new User(this.user);
         newUser.save();
         return resolve(newUser);
       }
@@ -112,21 +116,21 @@ class User {
       });
     }
 
-    return {exec: userModel.update({_id: this.user._id}, {$set: this.update}).exec(), cleanup: this.cleanup};
+    return {exec: User.update({_id: this.user._id}, {$set: this.update}).exec(), cleanup: this.cleanup};
   }
 
 
   readAll() {
-    return userModel.find({}).exec();
+    return User.find({}).exec();
   }
 
   *readUsers() {
-    yield userModel.find(this.query).exec();
+    yield User.find(this.query).exec();
   }
 
 
   setPassword(pw) {
-    let user = new userModel();
+    let user = new User();
       this.user.password = user.generateHash(pw);
       return this.user.password;
   }
@@ -143,4 +147,4 @@ class User {
   }
 
 }
-module.exports = User;
+module.exports = UserHandler;

@@ -38,27 +38,30 @@ module.exports = {
   },
 
   passportCreateLocalUser(req, email, password, done) {
-    userModel.findOne({'email': email, 'provider' : 'local'}, function(err, user) {
-      if(err)
-        return done(err);
-      if(user) {
+    let dbHandler = new userHandler();
+    let user = dbHandler.find({'email': email, 'provider': 'local'});
+
+    user.then(user => {
+      if(user)
         return done(null, false);
-      } else {
-        let newUser = new userHandler();
-        const data = {
-          provider: 'local',
-          email: email,
-          accounttype: (req.accounttype) ? req.accounttype : 0,
-          providerid: null,
-          password: newUser.setPassword(password),
-        }
-        newUser.createUser(data).then(newUserC => {
-          return done(null, newUserC);
-        }).catch(err => {
-          console.log(err);
-          return done(err, newUser);
-        });
-      }
+
+      const data = {
+        provider: 'local',
+        email: email,
+        accounttype: (req.accounttype) ? req.accounttype : 0,
+        providerid: null,
+        password: dbHandler.setPassword(password),
+      };
+
+      dbHandler.createUser(data).then(newUser => {
+        return done(null, newUser);
+      }).catch(err => {
+        console.log(err);
+        return done(err, dbHandler);
+      });
+
+    }).catch(err => {
+      return done(err);
     });
   },
 

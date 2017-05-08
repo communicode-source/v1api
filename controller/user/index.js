@@ -1,13 +1,13 @@
 'use strict'
 
-const userHandler  = require('./../../db/handler/user');
+const UserHandler  = require('./../../db/handler/user');
 
-class User {
+class UserController {
 
   updateUser(who, changes) {
-    const userClass = new userHandler();
+    const dbHandler = new UserHandler();
     return new Promise((resolve, reject) => {
-      userClass.addQuery(who)
+      dbHandler.addQuery(who)
       .readUsers()
       .next()
       .value
@@ -17,14 +17,14 @@ class User {
             return;
           }
           const user = users[0];
-          const updateFunc = userClass.prepUpdate(user, changes)
+          const updateFunc = dbHandler.prepUpdate(user, changes)
           .updateUser();
 
           const results = updateFunc.next();
 
           if(results.done === true && results.value.err) {
             resolve(results.value);
-            userClass.cleanup(false);
+            dbHandler.cleanup(false);
             return;
           } else if(results.done === true) {
             results.value
@@ -32,7 +32,7 @@ class User {
             .then(
               () => {
                 resolve({err: false, msg: 'Successful update.'});
-                userClass.cleanup(true);
+                dbHandler.cleanup(true);
               }
             )
           } else {
@@ -44,7 +44,7 @@ class User {
               .then(
                 () => {
                   resolve({err: false, msg: 'Updated successfully.'});
-                  userClass.cleanup(true);
+                  dbHandler.cleanup(true);
                 }
               );
             });
@@ -61,4 +61,4 @@ class User {
 }
 
 
-module.exports = User;
+module.exports = UserController;

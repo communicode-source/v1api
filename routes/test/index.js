@@ -36,10 +36,10 @@ router.route('/user/update')
 
   router.route('/user/make')
       .post(passport.authenticate('local-signup-dev', {
-          successRedirect : '/findPath',
-          failureRedirect : '/',
           session: false
-      }));
+      }), function(req, res, next) {
+        res.status(200).json({"Message": "Created User Successfully"});
+      });
       // const user = new userHandler();
       // const data = {
       //   provider: 'local',

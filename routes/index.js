@@ -5,13 +5,15 @@
 const callbacks      = require('./callbacks');
 const home          = require('./home');
 const jwt           = require('./jwt');
+const projects      = require('./projects');
 const test          = require('./test');
 
 const routes = {
   '/'     : home,
   '/update': callbacks,
   '/test' : test,
-  '/jwt'  : jwt
+  '/jwt'  : jwt,
+  '/projects': projects
 }
 
 module.exports = (app) => {
