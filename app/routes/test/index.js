@@ -11,7 +11,7 @@ router.route('/')
   .get( async (req, res) => {
     const response = await controller.index(req, res);
 
-    res.status(response.status).json(response.data);
+    res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
 

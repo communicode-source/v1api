@@ -1,27 +1,24 @@
-const router         = require('express').Router();
+import express, { Router } from 'express';
 
 // Require the ProjectController
-const controller     = require('./../../controller/project');
+import controller from './../../controller/project';
+
+const router = express.Router();
 
 router.route('/')
 
-  .get((req, res) => {
-    const projects = controller.index(req, res).next().value;
+  .get( async (req, res) => {
+    const response = await controller.index(req, res);
 
-    res.status(200).json(projects);
-
+    res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
 router.route('/:id')
 
-  .get((req, res) => {
-    const project = controller.findProject(req, res).next().value;
+  .get( async (req, res) => {
+    const response = await controller.findProject(req, res);
 
-    project.then(result => {
-      res.status(200).json(result);
-    }).catch(err => {
-      res.status(500).json({"message": "Couldn't fetch projects"});
-    });
+    res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
-module.exports = router;
+export default router;

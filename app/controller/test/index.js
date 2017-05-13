@@ -9,8 +9,9 @@
 
 // Require DB Handler
 import TestDBHandler from './../../db/handler/test';
+import Response from '../Response';
 
-class TestController {
+class TestController extends Response {
 
   /**
    * Index Test Controller - Logic for /test route
@@ -20,20 +21,17 @@ class TestController {
   async index(req, res) {
     const dbHandler = new TestDBHandler();
 
-    let response, statusCode;
+    let data, statusCode;
 
     try {
-      response = await dbHandler.findAll();
-      statusCode = 200;
+      data = await dbHandler.findAll();
+      statusCode = this.statusCode['success'];
     } catch(err) {
-      response = await dbHandler.findAll();
-      statusCode = 404;
+      data = await dbHandler.findAll();
+      statusCode = this.statusCode['not found'];
     }
 
-    return {
-      data: response,
-      status: statusCode
-    };
+    return new Response(data, statusCode);
   }
 
 }

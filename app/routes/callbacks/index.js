@@ -1,6 +1,7 @@
-const router   = require('express').Router();
-const passport = require('passport');
+import express, { Router } from 'express';
+import passport from 'passport';
 
+const router = express.Router();
 
 /**
 * FACEBOOK OAUTH CALLBACKS
@@ -55,4 +56,4 @@ router.route('/local/login') // Login Route.
   }));
 
 
-module.exports = router;
+export default router;

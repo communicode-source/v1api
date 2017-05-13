@@ -11,8 +11,8 @@ class ProjectHandler {
    * findAll()
    * Returns all projects from the projects collection
   **/
-  *findAll() {
-    yield Project.find({}).exec();
+  findAll() {
+    return Project.find({}).exec();
   }
 
   /**
@@ -20,8 +20,8 @@ class ProjectHandler {
    * @param id - the mongo id
    * Returns project from collection by _id
   **/
-  *findById(id) {
-    yield Project.findById(id).exec();
+  findById(id) {
+    return Project.findById(id).exec();
   }
 
   /**
@@ -29,8 +29,8 @@ class ProjectHandler {
    * @param query - the mongoose query to run.
    * Returns project(s) from collection by custom query
   **/
-  *find(query) {
-    yield Project.find(query).exec();
+  find(query) {
+    return Project.find(query).exec();
   }
 
 }
