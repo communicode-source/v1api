@@ -6,14 +6,16 @@ import callbacks from './callbacks';
 import home from './home';
 import jwt from './jwt';
 import projects from './projects';
+import secure from './secure';
 import test from './test';
 
 const routes = {
   '/'     : home,
-  '/update': callbacks,
-  '/test' : test,
   '/jwt'  : jwt,
-  '/projects': projects
+  '/projects': projects,
+  '/secure': secure,
+  '/test' : test,
+  '/update': callbacks,
 }
 
 export default (app) => {

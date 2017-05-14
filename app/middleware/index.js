@@ -5,6 +5,8 @@ import cors from 'cors';
 
 import mongo from './mongo';
 import passportMiddleware from './passport';
+import {sourced} from './sourced';
+import tokenMiddleware from './jwt';
 
 module.exports = (app) => {
 
@@ -14,11 +16,16 @@ module.exports = (app) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
 
+
+  app.use('/secure', tokenMiddleware);
+
   app.use(logger('dev'));
 
   app.use(cors());
 
   mongo();
+  sourced.connect();
+
 
   // Mongo middleware must come before.
   passportMiddleware(passport);
