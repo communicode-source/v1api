@@ -16,10 +16,11 @@ class UserHandler {
     this.modified         = [];
     this.update           = {};
     this.prepFail         = null;
+    this.model            = User;
   }
 
   find(query) {
-    return User.findOne(query).exec();
+    return this.model.findOne(query).exec();
   }
 
   createUser(data) {
@@ -31,8 +32,8 @@ class UserHandler {
     return this;
   }
 
-  updateUser(id) {
-    return User.update({_id: (id || this.user._id)}, {$set: this.update}).exec()
+  updateUser(id, things) {
+    return User.update({_id: (id || this.user._id)}, {$set: things}).exec()
   }
 
   strictUpdate(query) {

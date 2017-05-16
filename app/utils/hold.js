@@ -10,7 +10,7 @@ const userModel = require('./../db/model/user');
 
 module.exports = {
   lCaseIndex : (payload) => {
-    let base = {};
+    const base = {};
     for(let i in payload) {
       base[i.toLowerCase()] = payload[i];
     }
@@ -32,7 +32,6 @@ module.exports = {
     let inc = length;
     let userNum = getMatch(set, length);
     let iterator = 0;
-    // All is well.
     if(userNum == (length+1)) {
       return (+userNum + 1);
     }

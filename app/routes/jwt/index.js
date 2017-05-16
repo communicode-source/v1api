@@ -27,7 +27,7 @@ router.route('/decode/:jwt')
 
 router.route('/check/:jwt')
   .get((req, res) => {
-    res.status(200).json(controller.check(req.params.jwt, q));
+    res.status(200).json(controller.check(req.params.jwt, req));
   })
 
 export default router;
