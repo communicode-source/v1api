@@ -18,7 +18,7 @@ module.exports = (app) => {
   app.use(bodyParser.urlencoded({ extended: false }));
 
 
-  app.use('/secure', tokenMiddleware);
+  app.use('/', tokenMiddleware);
 
   app.use(sanatizer);
 
