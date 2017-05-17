@@ -6,9 +6,9 @@
  * Created at: 5/15/2017
  * A controller to handle logic for the Secure routes.
 **/
-import activeUser as isActive from './activeUser';
-import userLogin as LoginUtility from './userLogin';
-import userUpdate as UpdateUtility from './userUpdate';
+import {default as isActive} from './activeUser';
+import {default as LoginUtility} from './userLogin';
+import {default as UpdateUtility} from './userUpdate';
 
 
 module.exports = {
