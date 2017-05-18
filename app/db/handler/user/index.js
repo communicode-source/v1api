@@ -28,6 +28,12 @@ class UserHandler {
 	return this.model.find({$or:[ {'fname': reg}, {'lname': reg}]}).exec();
   }
 
+  dSearch(id) {
+	  const fReg = new RegExp('.*' + id[0] + '.*', 'i');
+	  const lReg = new RegExp('.*' + id[1] + '.*', 'i');
+	  return this.model.find({$or:[ {'fname': fReg}, {'lname': lReg}]}).exec();
+  }
+
   createUser(data) {
     return new User(data||this.user).save();
   }
