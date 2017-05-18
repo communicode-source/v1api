@@ -23,6 +23,11 @@ class UserHandler {
     return this.model.findOne(query).exec();
   }
 
+  search(id) {
+	const reg = new RegExp('.*'  + id + '.*', 'i');
+	return this.model.find({$or:[ {'fname': reg}, {'lname': reg}]}).exec();
+  }
+
   createUser(data) {
     return new User(data||this.user).save();
   }
@@ -48,6 +53,8 @@ class UserHandler {
   readUsers() {
     return User.find(this.query).exec();
   }
+
+
 
 
   setPassword(pw) {
