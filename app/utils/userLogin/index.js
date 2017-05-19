@@ -1,5 +1,6 @@
 'use strict';
 
+// This limits what fields come out of the database so that a password is not returned.
 export let LoginDataPull = user => {
   return {
     _id: user._id,

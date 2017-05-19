@@ -1,5 +1,7 @@
 'use strict';
 
+
+// Ensures there are not too many users in the database that match qualifications, and also checks the password, etc.
 export let verifyLocalLoginUser = (req, users, dbHandler) => {
   if(users.count != 1) {
     const SC = 'error';
