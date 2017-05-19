@@ -226,3 +226,54 @@ const getMatch = (set, length) => set[length].urlnum;
 //     });
 //   });
 // }
+
+
+verify : (req) => {
+  const token = req.userToken;
+  if(isActive(token) == false) {
+    return {err: true, msg: 'Invalid user token'};
+  }
+  return {err: false, msg: 'Token is valid'};
+},
+
+formatUpdateData: (req, secure = true) => {
+  const data = (secure == true) ? req.body.sanatized : req.body;
+
+  return userUpdate.lCaseIndex(data);
+},
+
+nameChangeProtection: async (tokenPayload, protectedData, dbHandler) => {
+  const containFoLName = ((protectedData.fname && protectedData.fname == tokenPayload.fname) || (protectedData.lname && protectedData.lname == tokenPayload.lname)) ? false : true;
+  if(containFoLName == false) {
+    return protectedData;
+  }
+  let fname = protectedData.fname || tokenPayload.fname;
+  let lname = protectedData.lname || tokenPayload.lname;
+
+  const set = await userUpdate.getSet(fname, lname, dbHandler.model)
+  const urlNum = getUrlNumber(set);
+  protectedData.url = fname+'.'+lname+toString(urlNum);
+  protectedData.urlnum = urlNum;
+  return protectedData;
+
+},
+
+},
+
+
+=====================================================================================================
+if(req.body.provider = 'local') {
+  const users = await dbHandler.addQuery({provider: 'local', email: req.body.email});
+  const localAuthenticate = verifyLocalLoginUser(req, users, dbHandler);
+  const SC = this.statusCode[localAuthenticate.status];
+  const data (SC == 'error') ? localAuthenticate.data : LoginDataPull(localAuthenticate.data);
+} else if(req.body.provider == 'facebook' || req.body.provider == 'google') {
+  const users = await dbHandler.addQuery({providerid: req.body.providerid, provider: req.body.provider}).readUsers();
+  const externalAuthenticate = verifyExternalUser(users);
+  const SC = this.statusCode[externalAuthenticate.status];
+  const verifyToken = verifyExternalAuthentication(req.body.token, req.body.provider);
+  const data = (SC == 'error') ? externalAuthenticate.data : LoginDataPull(externalAuthenticate.data);
+} else {
+  const SC = this.statusCode['error'];
+  const data = 'Mutated data.';
+}

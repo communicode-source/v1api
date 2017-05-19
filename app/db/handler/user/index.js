@@ -50,10 +50,12 @@ class UserHandler {
   }
 
 
-  setPassword(pw) {
-    let user = new User();
-      this.user.password = user.generateHash(pw);
-      return this.user.password;
+  makePassword(pw) {
+    return User.generateHash(pw);
+  }
+
+  checkPassword(pw, userModel) {
+    return userModel.validPassword(pw)
   }
 
   cleanup(extent) {
