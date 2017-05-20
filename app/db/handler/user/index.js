@@ -24,14 +24,22 @@ class UserHandler {
   }
 
   search(id) {
-	const reg = new RegExp('.*'  + id + '.*', 'i');
-	return this.model.find({$or:[ {'fname': reg}, {'lname': reg}]}).exec();
+	let array = id.split('');
+	id = array.join('.?'); // Add .? into string
+	const reg = new RegExp('.*'  + id + '.*', 'i'); // Create RegExp
+	return this.model.find({$or:[ {'fname': reg}, {'lname': reg}]}).exec(); // Search
   }
 
   dSearch(id) {
-	  const fReg = new RegExp('.*' + id[0] + '.*', 'i');
-	  const lReg = new RegExp('.*' + id[1] + '.*', 'i');
-	  return this.model.find({$or:[ {'fname': fReg}, {'lname': lReg}]}).exec();
+	let array = id[0].split('');
+	id[0] = array.join('.?'); // Add .? into first name
+	  console.log(id[0]);
+	array = id[1].split('');
+	id[1] = array.join('.?'); // Add .? into second name
+	  console.log(id[1]);
+	const fReg = new RegExp('.*' + id[0] + '.*', 'i'); // Create first RegExp
+	const lReg = new RegExp('.*' + id[1] + '.*', 'i'); // Create second RegExp
+	return this.model.find({$or:[ {'fname': fReg}, {'lname': lReg}]}).exec(); // Search
   }
 
   createUser(data) {

@@ -10,48 +10,56 @@ class SearchController  extends Response {
 		const dbHandler = new UserHandler();
 		let data, statusCode;
 		
-		id.split("_");
 
 		try {
-			if (id.length <= 1) //If not split, search normally
+			let farray, larray;
+			if (!id.includes('_')) // Search single name
 			{
 				data = await dbHandler.search(id);
+				farray = data.map(function(i) { // Array of distance from first names
+					return Levenshtein.get(i.fname, id);
+				});
+				larray = data.map(function(i) { // Array of distance from last names
+					return Levenshtein.get(i.lname, id);
+				});
 			}
-			else //Else, search both items
+			else // Search both names
 			{
-				data = await dbHandler.dSearch(id);
+				let idArray = id.split("_");
+				data = await dbHandler.dSearch(idArray);
+				farray = data.map(function(i) {
+					return Levenshtein.get(i.fname, idArray[0]);
+				});
+				larray = data.map(function(i) {
+					return Levenshtein.get(i.lname, idArray[1]);
+				});
 			}
-			const farray = data.map(function(i) { // Array of distance from first names
-				return Levenshtein.get(i.fname, id);
-			});
-			const larray = data.map(function(i) { // Array of distance from last names
-				return Levenshtein.get(i.lname, id);
-			});
 			data.sort(function(item1, item2) {
-				let useArray1, useArray2;
-				if (farray[data.indexOf(item1)] > larray[data.indexOf(item1)]) // if the item is closer to the first name
-				{
-					useArray1 = farray;
+				let useItem1, useItem2;
+				if (farray[data.indexOf(item1)] < larray[data.indexOf(item1)]) // if the item is closer 
+				{							       // to the first name
+					useItem1 = farray[data.indexOf(item1)]; // Use fname levenshtein distance
 				}
 				else
 				{
-					useArray1 = larray;
+					useItem1 = larray[data.indexOf(item1)]; // Use lname levenshtein distance
 				}
 
-				if (farray[data.indexOf(item2)] > larray[data.indexOf(item2)])
+				if (farray[data.indexOf(item2)] < larray[data.indexOf(item2)])
 				{
-					useArray2 = farray;
+					useItem2 = farray[data.indexOf(item2)];
 				}
 				else
 				{
-					useArray2 = larray;
+					useItem2 = larray[data.indexOf(item2)];
 				}
 
-				return 0 - useArray1[data.indexOf(item1)] + useArray2[data.indexOf(item2)]; // Sort
+				return useItem1 - useItem2; // Sort
 			});
 			statusCode = this.statusCode['success'];
 		} catch(err) {
-			data = await dbHandler.search(id);
+			console.log(err);
+			data = 'Internal Processing Error';
 			statusCode = this.statusCode['not found'];
 		}
 
