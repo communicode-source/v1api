@@ -10,7 +10,6 @@ class Mongo {
           console.log('Did you forget to run Mongo?');
           res();
         }
-        console.log('Reconnecting');
         this.db = db;
         res();
       });
