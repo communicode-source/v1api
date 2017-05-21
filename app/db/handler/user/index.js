@@ -27,7 +27,7 @@ class UserHandler {
 	let array = id.split('');
 	id = array.join('.?'); // Add .? into string
 	const reg = new RegExp('.*'  + id + '.*', 'i'); // Create RegExp
-	return this.model.find({$or:[ {'fname': reg}, {'lname': reg}]}).exec(); // Search
+	return this.model.find({$or:[ {'fname': reg}, {'lname': reg}, {'organizationname' : reg}]}).exec(); // Search
   }
 
   dSearch(id) {
@@ -37,7 +37,7 @@ class UserHandler {
 	id[1] = array.join('.?'); // Add .? into second name
 	const fReg = new RegExp('.*' + id[0] + '.*', 'i'); // Create first RegExp
 	const lReg = new RegExp('.*' + id[1] + '.*', 'i'); // Create second RegExp
-	return this.model.find({$and:[ {'fname': fReg}, {'lname': lReg}]}).exec(); // Search
+	return this.model.find({$or: [{$and:[ {'fname': fReg}, {'lname': lReg}]}, {'organizationname': fReg}]}).exec(); 
   }
 
   createUser(data) {

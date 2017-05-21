@@ -12,7 +12,7 @@ class SearchController  extends Response {
 		
 
 		try {
-			let farray, larray;
+			let farray, larray, oarray;
 			if (!id.includes('_')) // Search single name
 			{
 				data = await dbHandler.search(id);
@@ -22,6 +22,17 @@ class SearchController  extends Response {
 				larray = data.map(function(i) { // Array of distance from last names
 					return Levenshtein.get(i.lname, id);
 				});
+				oarray = data.map(function(i) { // Array of distance from organization names
+					if (i.organizationname != null)
+					{
+						return Levenshtein.get(i.oranizationname, id);
+					}
+					else
+					{
+						return 100;
+					}
+				});
+
 			}
 			else // Search both names
 			{
@@ -33,26 +44,22 @@ class SearchController  extends Response {
 				larray = data.map(function(i) {
 					return Levenshtein.get(i.lname, idArray[1]);
 				});
+				oarray = data.map(function(i) {
+					if (i.organizationname != null)
+					{
+						return Levenshtein.get(i.organizationname, id);
+					}
+					else
+					{
+						return 100;
+					}
+				});
 			}
 			data.sort(function(item1, item2) {
 				let useItem1, useItem2;
-				if (farray[data.indexOf(item1)] < larray[data.indexOf(item1)]) // if the item is closer 
-				{							       // to the first name
-					useItem1 = farray[data.indexOf(item1)]; // Use fname levenshtein distance
-				}
-				else
-				{
-					useItem1 = larray[data.indexOf(item1)]; // Use lname levenshtein distance
-				}
+					useItem1 = Math.min(farray[data.indexOf(item1)], larray[data.indexOf(item1)], oarray[data.indexOf(item1)]); // Use smallest levenshtein distance
 
-				if (farray[data.indexOf(item2)] < larray[data.indexOf(item2)])
-				{
-					useItem2 = farray[data.indexOf(item2)];
-				}
-				else
-				{
-					useItem2 = larray[data.indexOf(item2)];
-				}
+					useItem2 = Math.min(farray[data.indexOf(item2)], larray[data.indexOf(item2)],	oarray[data.indexOf(item2)]);
 
 				return useItem1 - useItem2; // Sort
 			});
