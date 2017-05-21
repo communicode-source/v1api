@@ -1,7 +1,7 @@
 'use strict';
 
 export let createLocalNewUser = (params) => {
-  fields                 = ['email',
+  const fields           = ['email',
                             'accounttype',
                             'provider',
                             'password',
@@ -15,13 +15,11 @@ export let createLocalNewUser = (params) => {
                             'interests'];
   const sendBack = {};
   for(let i in params) {
-    if(fields.indexOf(params[i]) == -1) {
+    if(fields.indexOf(i) == -1) {
       continue;
     }
-
     sendBack[i] = params[i];
   }
-
   if(!sendBack.password || !sendBack.email || !sendBack.provider || sendBack.provider !== 'local') {
     return false;
   }

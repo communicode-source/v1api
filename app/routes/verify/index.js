@@ -19,10 +19,22 @@ router.route('/')
   })
 
 router.route('/login')
-  .get(async (req, res) => {
-
+  .post(async (req, res) => {
     const response = await controller.loginUser(req, res);
+
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
+
+router.route('/create')
+  .post(async (req, res) => {
+    const response = await controller.createUser(req, res);
+    try{
+      res.status(response.getStatusCode()).json(response.getJSONData());
+    } catch(e) {
+      console.log(e);
+      console.log(response);
+      res.status(500).json({err: true, msg: 'Something went wrong'});
+    }
+  })
 
 module.exports = router;

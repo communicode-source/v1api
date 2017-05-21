@@ -237,7 +237,7 @@ verify : (req) => {
 },
 
 formatUpdateData: (req, secure = true) => {
-  const data = (secure == true) ? req.body.sanatized : req.body;
+  const data = (secure == true) ? req.body.sanitized : req.body;
 
   return userUpdate.lCaseIndex(data);
 },

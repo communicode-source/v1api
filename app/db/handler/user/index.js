@@ -87,7 +87,7 @@ class UserHandler {
   *  @return The encrypted password for insertion to the db.
   **/
   makePassword(pw) {
-    return User.generateHash(pw);
+    return new User().generateHash(pw);
   }
   /**
   *  @param pw, the password the user typed in.
