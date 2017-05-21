@@ -68,12 +68,10 @@ class UserController extends Response {
 
       const dbHandler = new UserHandler();
 
-      let SC, data;
-
-
+      let SC, data, newUser;
 
       try {
-        let newUser = (isLocal) ? createLocalUser(req.body.sanitized) : await createExternalUser(req.body.sanitized);
+        newUser = (isLocal) ? createLocalUser(req.body.sanitized) : await createExternalUser(req.body.sanitized);
         const unique = await uniqueUser(req.body.sanitized, dbHandler);
         if(unique === false)
           return new Response(100, this.statusCode['success']);
@@ -89,7 +87,7 @@ class UserController extends Response {
 
 
       try {
-        if(isLcoal)
+        if(isLocal)
           newUser.password = dbHandler.makePassword(newUser.password);
 
         newUser = await dbHandler.createUser(newUser);
