@@ -33,13 +33,11 @@ class UserHandler {
   dSearch(id) {
 	let array = id[0].split('');
 	id[0] = array.join('.?'); // Add .? into first name
-	  console.log(id[0]);
 	array = id[1].split('');
 	id[1] = array.join('.?'); // Add .? into second name
-	  console.log(id[1]);
 	const fReg = new RegExp('.*' + id[0] + '.*', 'i'); // Create first RegExp
 	const lReg = new RegExp('.*' + id[1] + '.*', 'i'); // Create second RegExp
-	return this.model.find({$or:[ {'fname': fReg}, {'lname': lReg}]}).exec(); // Search
+	return this.model.find({$and:[ {'fname': fReg}, {'lname': lReg}]}).exec(); // Search
   }
 
   createUser(data) {
