@@ -8,6 +8,7 @@ import jwt from './jwt';
 import projects from './projects';
 import secure from './secure';
 import test from './test';
+import verify from './verify';
 
 const routes = {
   '/'     : home,
@@ -16,6 +17,7 @@ const routes = {
   '/secure': secure,
   '/test' : test,
   '/update': callbacks,
+  '/verify': verify,
 }
 
 export default (app) => {

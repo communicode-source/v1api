@@ -7,7 +7,7 @@ export let verifyLocalLoginUser = (req, users, dbHandler) => {
     const SC = 'error';
     const data = 'No user with that email';
   } else {
-    if(!dbHandler.checkPassword(req.body.password, user[0])) {
+    if(!dbHandler.checkPassword(req.body.sanatized.password, user[0])) {
       const SC = 'error';
       const data = 'Something went wrong';
     } else {

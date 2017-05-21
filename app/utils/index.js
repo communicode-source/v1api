@@ -7,16 +7,25 @@
  * A controller to handle logic for the Secure routes.
 **/
 
-// This is the logic for logging in a local user.
-import localUserLogin from './localLogin';
-// This is the logic for loggin in an externally provider for user.
-import externalUserLogin from './externalLogin';
-
 // This contain shared logic.
-import userLogin from './userLogin';
+import {LoginDataPull as userLogin} from './userLogin';
+// This is the logic for logging in a local user.
+import {verifyLocalLoginUser as localLogin} from './localLogin';
+// This is the logic for logging in an externally provider for user.
+import {verifyExternalUser as externalLogin} from './externalLogin';
+// This is the logic for creating a new local user
+import {createLocalNewUser as localUserCreation} from './localCreation';
+// This is the logic for creating a new external user
+import {createExternalNewUser as externalUserCreation} from './externalCreation';
+import checkDB from './userCreation';
 
-export let LoginDataPull = userLogin.LoginDataPull;
+export let LoginDataPull = userLogin;
 
-export let verifyLocalLoginUser = localUserLogin.verifyLocalLoginUser;
+export let verifyLocalLoginUser = localLogin;
 
-export let verifyExternalUser = externalUserLogin.verifyExternalUser;
+export let verifyExternalUser = externalLogin;
+
+
+export let uniqueUser = checkDB;
+export let createLocalUser = localUserCreation;
+export let createExternalUser = {};

@@ -16,3 +16,8 @@ export let LoginDataPull = user => {
     organizationname: user.organizationname
   }
 }
+
+
+export let verifyExternalProviderKey = req => {
+
+}
