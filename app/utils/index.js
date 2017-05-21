@@ -17,6 +17,7 @@ import {verifyExternalUser as externalLogin} from './externalLogin';
 import {createLocalNewUser as localUserCreation} from './localCreation';
 // This is the logic for creating a new external user
 import {createExternalNewUser as externalUserCreation} from './externalCreation';
+import verifyGoogle from './googleVerifier';
 import checkDB from './userCreation';
 
 export let LoginDataPull = userLogin;
@@ -28,4 +29,11 @@ export let verifyExternalUser = externalLogin;
 
 export let uniqueUser = checkDB;
 export let createLocalUser = localUserCreation;
-export let createExternalUser = {};
+export let createExternalUser = async (params) => {
+  const res = await externalUserCreation(params, verifyGoogle, null);
+  if(res === false){
+    throw new Error('Something went wrong when verifying the access token')
+    return;
+  }
+  return res;
+};

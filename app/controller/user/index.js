@@ -7,10 +7,10 @@
  * A controller to handle the login, update, logout, and sign up of users.
 **/
 
+import jwt from './../jwt';
+import Response from './../Response.js';
 // Require the Handler for the user.
 import UserHandler from './../../db/handler/user';
-import Response from './../Response.js';
-import jwt from './../jwt';
 // Utilities for the logins and sign ups because they contain a lot of logic.
 import {LoginDataPull, verifyLocalLoginUser, createLocalUser, createExternalUser, uniqueUser} from './../../utils';
 
@@ -23,8 +23,8 @@ class UserController extends Response {
    * @param res - Express Response object
   **/
   async loginUser(req, res) {
-    if(['facebook', 'google', 'local'].indexOf(req.body.provider) === -1)
-      return new Response('Mutated data', this.statusCode['error']);
+    if(['facebook', 'google', 'local'].indexOf(req.body.sanitized.provider) === -1)
+      return new Response(101, this.statusCode['success']);
 
     const dbHandler = new UserHandler();
     let authenticate, SC, data;
@@ -45,12 +45,12 @@ class UserController extends Response {
         : verifyExternalUser(users);
 
       SC = this.statusCode[authenticate.status];
-      data = (SC == 500) ? authenticate.data : jwt.generate(LoginDataPull(authenticate.data));
+      data = (SC == 500) ? 101 : jwt.generate(LoginDataPull(authenticate.data));
 
     } catch(e) {
       console.log(e);
-      SC = this.statusCode['error'];
-      data = 'Internal processing error.';
+      SC = this.statusCode['success'];
+      data = 101;
     }
 
     return new Response(data, SC);
@@ -71,25 +71,26 @@ class UserController extends Response {
       let SC, data;
 
 
-      let newUser = (isLocal) ? createLocalUser(req.body.sanitized) : createExternalUser(req.body.sanitized);
 
       try {
+        let newUser = (isLocal) ? createLocalUser(req.body.sanitized) : await createExternalUser(req.body.sanitized);
         const unique = await uniqueUser(req.body.sanitized, dbHandler);
         if(unique === false)
-          return new Response('Not a new user', this.statusCode['error']);
+          return new Response(100, this.statusCode['success']);
       } catch(e) {
         console.log(e);
-        SC = this.statusCode['error'];
-        data = 'Something went wrong';
+        SC = this.statusCode['success'];
+        data = 100;
       }
 
       if(newUser === false) {
-        return new Response('The required data was not passed through', this.statusCode['error']);
+        return new Response(100, this.statusCode['success']);
       }
 
 
       try {
-        newUser.password = dbHandler.makePassword(newUser.password);
+        if(isLcoal)
+          newUser.password = dbHandler.makePassword(newUser.password);
 
         newUser = await dbHandler.createUser(newUser);
 
@@ -99,7 +100,7 @@ class UserController extends Response {
       } catch(e) {
         console.log(e);
         SC = this.statusCode['error'];
-        data = 'Something went wrong';
+        data = 100;
       }
       return new Response(data, SC);
     }

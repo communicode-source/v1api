@@ -10,7 +10,7 @@ export let verifyLocalLoginUser = (req, users, dbHandler) => {
   } else {
     if(!dbHandler.checkPassword(req.body.sanitized.password, users[0])) {
       SC = 'error';
-      data = 'Something went wrong';
+      data = 'Incorrect password';
     } else {
       SC = 'success';
       data = users[0];
