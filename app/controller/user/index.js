@@ -12,7 +12,7 @@ import Response from './../Response.js';
 // Require the Handler for the user.
 import UserHandler from './../../db/handler/user';
 // Utilities for the logins and sign ups because they contain a lot of logic.
-import {LoginDataPull, verifyLocalLoginUser, createLocalUser, uniqueUser} from './../../utils';
+import {LoginDataPull, verifyLocalLoginUser, createLocalUser, createExternalUser, uniqueUser} from './../../utils';
 
 
 class UserController extends Response {
