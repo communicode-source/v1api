@@ -12,7 +12,7 @@ import Response from './../Response.js';
 // Require the Handler for the user.
 import UserHandler from './../../db/handler/user';
 // Utilities for the logins and sign ups because they contain a lot of logic.
-import {LoginDataPull, verifyLocalLoginUser, createLocalUser, createExternalUser, uniqueUser} from './../../utils';
+import {LoginDataPull, verifyLocalLoginUser, createLocalUser, uniqueUser} from './../../utils';
 
 
 class UserController extends Response {
@@ -23,7 +23,7 @@ class UserController extends Response {
    * @param res - Express Response object
   **/
   async loginUser(req, res) {
-    if(['facebook', 'google', 'local'].indexOf(req.body.sanitized.provider) === -1)
+    if(req.body.sanitized.provider !== 'local')
       return new Response(101, this.statusCode['success']);
 
     const dbHandler = new UserHandler();
@@ -31,18 +31,13 @@ class UserController extends Response {
 
 
     try {
-      // this is an abnoxious ternary but it prevents two other if statements.
       const isLocal = (req.body.sanitized.provider === 'local')
-      const query = (isLocal)
-        ? {provider: 'local', email: req.body.sanitized.email}
-        : {providerid: req.body.sanitized.providerid, provider: req.body.sanitized.provider};
-
+      const query = {provider: 'local', email: req.body.sanitized.email};
 
       const users = await dbHandler.addQuery(query).readUsers();
 
-      authenticate = (isLocal)
-        ? verifyLocalLoginUser(req, users, dbHandler)
-        : verifyExternalUser(users);
+      authenticate = verifyLocalLoginUser(req, users, dbHandler);
+
 
       SC = this.statusCode[authenticate.status];
       data = (SC == 500) ? 101 : jwt.generate(LoginDataPull(authenticate.data));
@@ -64,14 +59,16 @@ class UserController extends Response {
     **/
     async createUser(req, res) {
       const isLocal = (req.body.sanitized.provider === 'local');
-
+      if(!isLocal) {
+        return new Response(100, this.statusCode['success']);
+      }
 
       const dbHandler = new UserHandler();
 
       let SC, data, newUser;
 
       try {
-        newUser = (isLocal) ? createLocalUser(req.body.sanitized) : await createExternalUser(req.body.sanitized);
+        newUser = createLocalUser(req.body.sanitized);
         const unique = await uniqueUser(req.body.sanitized, dbHandler);
         if(unique === false)
           return new Response(100, this.statusCode['success']);
