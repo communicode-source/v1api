@@ -46,7 +46,7 @@ class UserController extends Response {
 
       SC = this.statusCode[authenticate.status];
       data = (SC == 500) ? 101 : jwt.generate(LoginDataPull(authenticate.data));
-
+      SC = 200;
     } catch(e) {
       console.log(e);
       SC = this.statusCode['success'];
