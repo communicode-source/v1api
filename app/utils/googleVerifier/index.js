@@ -1,5 +1,5 @@
 import GoogleAuth from 'google-auth-library';
-import auth from './../../config/auth.json';
+import {google as auth} from './../../config/auth.json';
 export default (accessToken, AT) => {
   const auth = new GoogleAuth;
 
