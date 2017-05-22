@@ -3,11 +3,11 @@ import {google as auth} from './../../config/auth.json';
 export default (accessToken, AT) => {
   const auth = new GoogleAuth;
 
-  const client = new auth.OAuth2(auth.google.clientID, '', '');
+  const client = new auth.OAuth2(auth.clientID, '', '');
   return new Promise((response, reject) => {
     client.verifyIdToken(accessToken, auth.clientID, (e, login) => {
       const payload = login.getPayload();
-      if(payload['aud'] !== auth.google.clientID || e) {
+      if(payload['aud'] !== auth.clientID || e) {
         response(false);
       }
       const user = {
