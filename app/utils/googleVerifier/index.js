@@ -5,7 +5,7 @@ export default (accessToken, AT) => {
 
   const client = new auth.OAuth2(auth.google.clientID, '', '');
   return new Promise((response, reject) => {
-    client.verifyIdToken(accessToken, auth.google.clientID, (e, login) => {
+    client.verifyIdToken(accessToken, auth.clientID, (e, login) => {
       const payload = login.getPayload();
       if(payload['aud'] !== auth.google.clientID || e) {
         response(false);
