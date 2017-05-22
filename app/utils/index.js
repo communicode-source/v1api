@@ -16,7 +16,7 @@ import {verifyExternalUser as externalLogin} from './externalLogin';
 // This is the logic for creating a new local user
 import {createLocalNewUser as localUserCreation} from './localCreation';
 // This is the logic for creating a new external user
-import {createExternalNewUser as externalUserCreation} from './externalCreation';
+import externalUserCreation from './externalCreation';
 import verifyGoogle from './googleVerifier';
 import checkDB from './userCreation';
 
