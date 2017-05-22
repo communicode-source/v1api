@@ -17,13 +17,8 @@ import {LoginDataPull, verifyLocalLoginUser, createLocalUser, uniqueUser} from '
 
 class UserController extends Response {
 
-  /**
-   * User Login - Logic for login routes.
-   * @param req - Express Request object
-   * @param res - Express Response object
-  **/
   async loginUser(req, res) {
-    if(req.body.sanitized.provider !== 'local')
+    if(['facebook', 'google', 'local'].indexOf(req.body.sanitized.provider) === -1)
       return new Response(101, this.statusCode['success']);
 
     const dbHandler = new UserHandler();
@@ -32,12 +27,16 @@ class UserController extends Response {
 
     try {
       const isLocal = (req.body.sanitized.provider === 'local')
-      const query = {provider: 'local', email: req.body.sanitized.email};
+      const query = (isLocal)
+        ? {provider: 'local', email: req.body.sanitized.email}
+        : {providerid: req.body.sanitized.providerid, provider: req.body.sanitized.provider};
+
 
       const users = await dbHandler.addQuery(query).readUsers();
 
-      authenticate = verifyLocalLoginUser(req, users, dbHandler);
-
+      authenticate = (isLocal)
+        ? verifyLocalLoginUser(req, users, dbHandler)
+        : verifyExternalUser(users);
 
       SC = this.statusCode[authenticate.status];
       data = (SC == 500) ? 101 : jwt.generate(LoginDataPull(authenticate.data));
@@ -52,23 +51,16 @@ class UserController extends Response {
   }
 
 
-    /**
-     * User Creation - Logic for login routes.
-     * @param req - Express Request object
-     * @param res - Express Response object
-    **/
     async createUser(req, res) {
       const isLocal = (req.body.sanitized.provider === 'local');
-      if(!isLocal) {
-        return new Response(100, this.statusCode['success']);
-      }
+
 
       const dbHandler = new UserHandler();
 
       let SC, data, newUser;
 
       try {
-        newUser = createLocalUser(req.body.sanitized);
+        newUser = (isLocal) ? createLocalUser(req.body.sanitized) : await createExternalUser(req.body.sanitized);
         const unique = await uniqueUser(req.body.sanitized, dbHandler);
         if(unique === false)
           return new Response(100, this.statusCode['success']);
@@ -101,6 +93,5 @@ class UserController extends Response {
     }
 
 }
-
 
 export let controller = new UserController();
