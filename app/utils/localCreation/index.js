@@ -20,7 +20,7 @@ export let createLocalNewUser = (params) => {
     }
     sendBack[i] = params[i];
   }
-  if(!sendBack.password || !sendBack.email || !sendBack.provider || sendBack.provider !== 'local') {
+  if(!sendBack.password || !sendBack.email || !sendBack.provider || sendBack.provider !== 'local' || sendBack.email == "" || sendBack.password == "") {
     return false;
   }
   return sendBack;

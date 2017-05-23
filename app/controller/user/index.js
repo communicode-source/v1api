@@ -61,7 +61,7 @@ class UserController extends Response {
 
       try {
         newUser = (isLocal) ? createLocalUser(req.body.sanitized) : await createExternalUser(req.body.sanitized);
-        const unique = await uniqueUser(req.body.sanitized, dbHandler);
+        const unique = await uniqueUser(newUser, dbHandler);
         if(unique === false)
           return new Response(100, this.statusCode['success']);
       } catch(e) {

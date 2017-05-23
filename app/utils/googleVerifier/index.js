@@ -1,18 +1,20 @@
 import GoogleAuth from 'google-auth-library';
-import {google as auth} from './../../config/auth.json';
-export default (accessToken, AT) => {
-  const auth = new GoogleAuth;
+import {google as cid} from './../../config/auth.json';
 
-  const client = new auth.OAuth2(auth.clientID, '', '');
+
+export default (accessToken, AT) => {
+  console.log(accessToken);
+  const auth = new GoogleAuth;
+  const client = new auth.OAuth2(cid.clientID, '', '');
   return new Promise((response, reject) => {
-    client.verifyIdToken(accessToken, auth.clientID, (e, login) => {
+    client.verifyIdToken(accessToken, cid.clientID, function(e, login) {
       if(e) {
         console.log(e);
-        response(false);
+        return response(false);
       }
       const payload = login.getPayload();
-      if(payload['aud'] !== auth.clientID || e) {
-        response(false);
+      if(payload['aud'] !== cid.clientID || e) {
+        return response(false);
       }
       const user = {
         providerid: payload['sub'],
@@ -22,7 +24,7 @@ export default (accessToken, AT) => {
         email: payload['email'],
         accounttype: AT
       }
-      response(user);
+      return response(user);
     })
   });
 }
