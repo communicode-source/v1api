@@ -17,10 +17,24 @@ class SearchController  extends Response {
 			{
 				data = await dbHandler.search(id);
 				farray = data.map(function(i) { // Array of distance from first names
-					return Levenshtein.get(i.fname, id);
+					if (i.fname != null)
+					{
+						return Levenshtein.get(i.fname, id);
+					}
+					else
+					{
+						return 100;
+					}
 				});
 				larray = data.map(function(i) { // Array of distance from last names
-					return Levenshtein.get(i.lname, id);
+					if (i.lname != null)
+					{
+						return Levenshtein.get(i.lname, id);
+					}
+					else
+					{
+						return 100;
+					}
 				});
 				oarray = data.map(function(i) { // Array of distance from organization names
 					if (i.organizationname != null)
@@ -39,10 +53,24 @@ class SearchController  extends Response {
 				let idArray = id.split("_");
 				data = await dbHandler.dSearch(idArray);
 				farray = data.map(function(i) {
-					return Levenshtein.get(i.fname, idArray[0]);
+					if (i.fname != null)
+					{
+						return Levenshtein.get(i.fname, idArray[0]);
+					}
+					else
+					{
+						return 100;
+					}
 				});
 				larray = data.map(function(i) {
-					return Levenshtein.get(i.lname, idArray[1]);
+					if (i.lname != 0)
+					{
+						return Levenshtein.get(i.lname, idArray[1]);
+					}
+					else
+					{
+						return 100;
+					}
 				});
 				oarray = data.map(function(i) {
 					if (i.organizationname != null)
