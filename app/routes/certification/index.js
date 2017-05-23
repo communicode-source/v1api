@@ -27,12 +27,14 @@ router.route('/certify/:id')
 //returns true/false based on the status of isCertifid of the nonprofits account
   .get( async (req, res) => {
     const response = await controller.certify(req, res);
-
-    res.status(response.getStatusCode()).json(response.getJSONData());
-    if (response == null){
+    if (response.getJSONData() == null){
       res.status(200).json({
         msg: 'False'
       });
+      return;
+    } else {
+      res.status(response.getStatusCode()).json(response.getJSONData());
+      return;
     }
   });
 
