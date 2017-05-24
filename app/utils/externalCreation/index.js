@@ -2,7 +2,6 @@
 
 
 export default async (params, google, facebook) => {
-  console.log(params);
   try{
     if(params.provider === 'google' && params.token_id) {
       return await google(params.token_id, params.accounttype);

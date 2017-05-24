@@ -25,7 +25,14 @@ export let LoginDataPull = userLogin;
 
 export let verifyLocalLoginUser = localLogin;
 
-export let verifyExternalUser = externalLogin;
+export let verifyExternalLoginUser = async (params) => {
+  const res = await externalUserCreation(params, verifyGoogle, verifyFacebook);
+  if(res === false){
+    throw new Error('Something went wrong when verifying the access token')
+    return;
+  }
+  return res;
+};
 
 
 export let uniqueUser = checkDB;
