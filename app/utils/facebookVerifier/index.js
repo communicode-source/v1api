@@ -16,15 +16,7 @@ export default (accessToken, AT, email, name, id) => {
       res.on('data', (d) => {
         data = JSON.parse(d);
         if(!data.data || data.data.is_valid !== true || data.data.app_id !== cid.clientID || data.data.user_id !== id)
-        {
-          console.log('The id you sent was: '+id);
-          console.log('The id received from FB is '+data.data.user_id);
-          console.log('They should match');
-          console.log('Lastly, '+cid.clientID+' and '+data.data.app_id+' should match');
-          console.log(data.data.is_valid+' Should be true');
-          console.log('Issue 1');
           response(false);
-        }
         const payName = name.split(" ");
         const user = {
           providerid: id,
