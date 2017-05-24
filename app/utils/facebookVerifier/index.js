@@ -17,6 +17,7 @@ export default (accessToken, AT, email, name, id) => {
         data = JSON.parse(d);
         if(!data.data || data.data.is_valid !== true || data.data.app_id !== cid.clientID || data.data.user_id !== id)
         {
+          console.log(data);
           console.log('Issue 1');
           response(false);
         }
