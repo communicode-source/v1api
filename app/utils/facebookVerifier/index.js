@@ -3,7 +3,7 @@ import {facebook as cid} from './../../config/auth.json';
 
 
 export default (accessToken, AT, email, name, id) => {
-  return new Promise((res, rej) => {
+  return new Promise((response, rej) => {
     let data;
     const options = {
       host: 'graph.facebook.com',
@@ -16,7 +16,7 @@ export default (accessToken, AT, email, name, id) => {
       res.on('data', (d) => {
         data = JSON.parse(d);
         if(!data.data || !data.data.is_valid || data.data.is_valid !== true || data.data.app_id !== cid.clientID || data.data.user_id !== id)
-        res(false);
+          response(false);
         const payName = name.split(" ");
         const user = {
           providerid: id,
@@ -26,12 +26,12 @@ export default (accessToken, AT, email, name, id) => {
           email: email,
           accounttype: AT
         }
-        res(user);
+          response(user);
       });
 
 
     }).on('error', (e) => {
-      res(false);
+        response(false);
     });
   });
 }
