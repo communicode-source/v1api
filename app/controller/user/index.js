@@ -33,7 +33,7 @@ class UserController extends Response {
 
       authenticate = (isLocal) ? verifyLocalLoginUser(req, users, dbHandler) : {status: 'success', data: users[0]};
 
-      if(users.length !== 1 authenticate.status !== 'success') {
+      if(users.length !== 1 || authenticate.status !== 'success') {
         throw new Error('Too many/few users')
       }
 
