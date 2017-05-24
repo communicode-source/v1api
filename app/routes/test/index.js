@@ -59,7 +59,6 @@ router.route('/d')
           email: email,
           accounttype: AT
         }
-        s.send(user);
       });
 
 
