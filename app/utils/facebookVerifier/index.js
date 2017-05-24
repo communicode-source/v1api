@@ -15,7 +15,7 @@ export default (accessToken, AT, email, name, id) => {
 
       res.on('data', (d) => {
         data = JSON.parse(d);
-        if(!data.data || !data.data.is_valid || data.data.is_valid !== true || data.data.app_id !== facebook.clientID || data.data.user_id !== id)
+        if(!data.data || !data.data.is_valid || data.data.is_valid !== true || data.data.app_id !== cid.clientID || data.data.user_id !== id)
         res(false);
         const payName = name.split(" ");
         const user = {
