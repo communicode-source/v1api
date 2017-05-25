@@ -107,6 +107,7 @@ class UserHandler {
     let user = new User();
       this.user.password = user.generateHash(pw);
       return this.user.password;
+    }
   /**
   *  @param pw, This is the password to be encrypted.
   *  @return The encrypted password for insertion to the db.
