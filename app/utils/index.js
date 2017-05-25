@@ -27,8 +27,12 @@ import verifyFacebook from './facebookVerifier';
 
 
 export let LoginDataPull = userLogin;
-export let verifyLocalLoginUser = localLogin;
-export let verifyExternalLoginUser = async (params) => await externalUserCreation(params, verifyGoogle, verifyFacebook)
+export let isLocalUser = async (userToLogin, dbHandler) => {
+  const results = await checkDB(userToLogin, dbHandler, 1)
+  await localLogin(userToLogin, results, dbHandler)
+  return results
+}
+export let verifyExternalLoginUser = (params) => externalUserCreation(params, verifyGoogle, verifyFacebook)
 export let createExternalUser = (params) => externalUserCreation(params, verifyGoogle, verifyFacebook)
 export let uniqueUser = checkDB;
 export let ensureOnlyOne = (info, dbHandler) => checkDB(info, dbHandler, 1)

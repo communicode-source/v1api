@@ -6,5 +6,5 @@ export default async(info, dbHandler, length=0) => {
     if(res.length != length) {
       throw new Error('Mismatch between desired number of users in DB and actual number: Desired: '+ length+', Actual: '+res.length)
     }
-    return true;
+    return (length === 1) ? res[0] : true;
 }

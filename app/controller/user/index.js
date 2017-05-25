@@ -12,59 +12,34 @@ import Response from './../Response.js'
 // Require the Handler for the user.
 import UserHandler from './../../db/handler/user'
 // Utilities for the logins and sign ups because they contain a lot of logic.
-import {LoginDataPull, verifyExternalLoginUser, verifyLocalLoginUser, createLocalUser, createExternalUser, uniqueUser} from './../../utils'
+import {LoginDataPull, verifyExternalLoginUser, isLocalUser, createLocalUser, createExternalUser, uniqueUser, ensureOnlyOne} from './../../utils'
 
 
 class UserController extends Response {
 
   async loginUser(req, res) {
-    if(['facebook', 'google', 'local'].indexOf(req.body.sanitized.provider) === -1)
-      return new Response(101, this.statusCode['success'])
-
+    // Declarations of constants
+    const contents = req.body.sanitized
     const dbHandler = new UserHandler()
-    let authenticate, status, data, user
+    const isLocal = (req.body.sanitized.provider === 'local')
+    // Declarations of  variables
+    let status, data, newUser
 
     try {
-      const isLocal = (req.body.sanitized.provider === 'local')
-      user = (isLocal) ? req.body.sanitized : await createExternalUser(req.body.sanatized)
-      const query = (isLocal) ? {provider: 'local', email: user.email} : {provider: user.provider, providerid: user.providerid}
+      let user = contents
 
-      const users = await dbHandler.addQuery(query).readUsers()
-
-      authenticate = (isLocal) ? verifyLocalLoginUser(req, users, dbHandler) : {status: 'success', data: users[0]}
-
-      if(users.length !== 1 || authenticate.status !== 'success') {
-        throw new Error('Too many/few users')
-      }
-
+      // Gets the user from the database and does checking to ensure passwords match, etc.
+      user = (isLocal) ? await isLocalUser(user, dbHandler) : await uniqueUser(await createExternalUser(contents), dbHandler, 1)
+      console.log(user)
+      // Create the status code and the user JWT as data.
       status = this.statusCode['success']
-      data = jwt.generate(LoginDataPull(authenticate.data))
+      data = jwt.generate(LoginDataPull(uniqueUser))
 
     } catch(e) {
+      console.log(e)
       status = this.statusCode['success']
-      data = 101
+      data = 100
     }
-    // try {
-    //   const isLocal = (req.body.sanitized.provider === 'local')
-    //   const query = (isLocal)
-    //     ? {provider: 'local', email: req.body.sanitized.email}
-    //     : {providerid: req.body.sanitized.providerid, provider: req.body.sanitized.provider}
-    //
-    //
-    //   const users = await dbHandler.addQuery(query).readUsers()
-    //
-    //   authenticate = (isLocal)
-    //     ? verifyLocalLoginUser(req, users, dbHandler)
-    //     : verifyExternalUser(users)
-    //
-    //   status = this.statusCode[authenticate.status]
-    //   data = (status == 500) ? 101 : jwt.generate(LoginDataPull(authenticate.data))
-    //   status = 200
-    // } catch(e) {
-    //   console.log(e)
-    //   status = this.statusCode['success']
-    //   data = 101
-    // }
 
     return new Response(data, status)
   }

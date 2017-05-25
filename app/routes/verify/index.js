@@ -20,9 +20,13 @@ router.route('/')
 
 router.route('/login')
   .post(async (req, res) => {
-    const response = await controller.loginUser(req, res);
+    try{
+      const response = await controller.loginUser(req, res);
 
-    res.status(response.getStatusCode()).json(response.getJSONData());
+      res.status(response.getStatusCode()).json(response.getJSONData());
+    } catch(e) {
+      res.status(200).json({err: true, msg: 101})
+    }
   });
 
 router.route('/create')

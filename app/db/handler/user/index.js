@@ -94,8 +94,8 @@ class UserHandler {
   *  @param userModel, this is hte mongodb object that has the user from the db.
   *  @return Boolean, whether or not the passwords match.
   **/
-  checkPassword(pw, userModel) {
-    return userModel.validPassword(pw)
+  checkPassword(user, userModel) {
+    return userModel.validPassword(user.password)
   }
   /**
   *  This function resets the class for use with another user/query without have to do it manually or creating another handler instance.
