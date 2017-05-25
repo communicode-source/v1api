@@ -3,18 +3,18 @@ import {google as cid} from './../../config/auth.json';
 
 
 export default (accessToken, AT) => {
-  console.log(accessToken);
   const auth = new GoogleAuth;
   const client = new auth.OAuth2(cid.clientID, '', '');
   return new Promise((response, reject) => {
     client.verifyIdToken(accessToken, cid.clientID, function(e, login) {
       if(e) {
-        console.log(e);
+        throw new Error(e)
         return response(false);
       }
       const payload = login.getPayload();
-      if(payload['aud'] !== cid.clientID || e) {
-        return response(false);
+      if(payload['aud'] !== cid.clientID) {
+        throw new Error('Token not meant for Communicode')
+        return response(false)
       }
       const user = {
         providerid: payload['sub'],

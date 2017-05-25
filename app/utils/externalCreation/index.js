@@ -2,14 +2,17 @@
 
 
 export default async (params, google, facebook) => {
-  try{
-    if(params.provider === 'google' && params.token_id) {
-      return await google(params.token_id, params.accounttype);
-    } else if(params.provider === 'facebook' && params.token_id) {
-      return await facebook(params.token_id, params.accounttype, params.email, params.name, params.userid);
-    }
-    return false;
-  } catch (e) {
-    return false;
+  let providerCheck
+  if(params.token_id) {
+    providerCheck = (params.provider === 'google')
+        ? await google(params.token_id, params.accounttype)
+        : (params.provider === 'facebook')
+          ? await facebook(params.token_id, params.accounttype, params.email, params.name, params.userid)
+          : false
   }
+  if(!providerCheck || providerCheck === false) {
+    throw new Error('Invalid provider and/or token')
+    return
+  }
+  return providerCheck
 }

@@ -1,6 +1,6 @@
 'use strict';
 
-export let createLocalNewUser = (params) => {
+export let createLocalNewUser = (params, handle) => {
   const fields           = ['email',
                             'accounttype',
                             'provider',
@@ -20,8 +20,9 @@ export let createLocalNewUser = (params) => {
     }
     sendBack[i] = params[i];
   }
-  if(!sendBack.password || !sendBack.email || !sendBack.provider || sendBack.provider !== 'local' || sendBack.email == "" || sendBack.password == "") {
-    return false;
+  if(!sendBack.password || !sendBack.email || !sendBack.provider || sendBack.provider !== 'local' || sendBack.email == "" || sendBack.password.trim() == "") {
+    throw new Error('Invalid user properties')
   }
+  sendBack.password = handle.makePassword(sendBack.password.trim())
   return sendBack;
 }

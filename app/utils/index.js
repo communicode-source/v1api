@@ -13,35 +13,23 @@ import {LoginDataPull as userLogin} from './userLogin';
 import {verifyLocalLoginUser as localLogin} from './localLogin';
 // This is the logic for logging in an externally provider for user.
 import {verifyExternalUser as externalLogin} from './externalLogin';
-// This is the logic for creating a new local user
+// This is the logic for creating a new local user.
 import {createLocalNewUser as localUserCreation} from './localCreation';
-// This is the logic for creating a new external user
+// This is the logic for creating a new external user.
 import externalUserCreation from './externalCreation';
+// Specific logic for verifying Google tokens.
 import verifyGoogle from './googleVerifier';
+// Logic for ensuring the user is unique / in the database.
 import checkDB from './userCreation';
+// Specific logic for verifying facebook tokens.
 import verifyFacebook from './facebookVerifier';
 
+
+
 export let LoginDataPull = userLogin;
-
 export let verifyLocalLoginUser = localLogin;
-
-export let verifyExternalLoginUser = async (params) => {
-  const res = await externalUserCreation(params, verifyGoogle, verifyFacebook);
-  if(res === false){
-    throw new Error('Something went wrong when verifying the access token')
-    return;
-  }
-  return res;
-};
-
-
+export let verifyExternalLoginUser = async (params) => await externalUserCreation(params, verifyGoogle, verifyFacebook)
+export let createExternalUser = (params) => externalUserCreation(params, verifyGoogle, verifyFacebook)
 export let uniqueUser = checkDB;
+export let ensureOnlyOne = (info, dbHandler) => checkDB(info, dbHandler, 1)
 export let createLocalUser = localUserCreation;
-export let createExternalUser = async (params) => {
-  const res = await externalUserCreation(params, verifyGoogle, verifyFacebook);
-  if(res === false){
-    throw new Error('Something went wrong when verifying the access token')
-    return;
-  }
-  return res;
-};
