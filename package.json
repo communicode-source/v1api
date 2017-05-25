@@ -12,6 +12,7 @@
     "cors": "^2.8.3",
     "express": "~4.8.0",
     "express-session": "^1.15.0",
+    "fast-levenshtein": "^2.0.6",
     "google-auth-library": "^0.10.0",
     "jsonwebtoken": "^7.3.0",
     "jwt-simple": "^0.5.1",

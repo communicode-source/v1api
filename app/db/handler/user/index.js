@@ -35,6 +35,24 @@ class UserHandler {
   find(query) {
     return this.model.findOne(query).exec();
   }
+
+  search(id) {
+	let array = id.split('');
+	id = array.join('.?'); // Add .? into string
+	const reg = new RegExp('.*'  + id + '.*', 'i'); // Create RegExp
+	return this.model.find({$or:[ {'fname': reg}, {'lname': reg}, {'organizationname' : reg}]}).exec(); // Search
+  }
+
+  dSearch(id) {
+	let array = id[0].split('');
+	id[0] = array.join('.?'); // Add .? into first name
+	array = id[1].split('');
+	id[1] = array.join('.?'); // Add .? into second name
+	const fReg = new RegExp('.*' + id[0] + '.*', 'i'); // Create first RegExp
+	const lReg = new RegExp('.*' + id[1] + '.*', 'i'); // Create second RegExp
+	return this.model.find({$or: [{$and:[ {'fname': fReg}, {'lname': lReg}]}, {'organizationname': fReg}]}).exec();
+  }
+
   /**
   *  @param data, this is what the user will be created with. It is optional so long as you have provided a this.user somewhere else.
   *  @return Mongoose Model of user, this is the user that you just saved.
@@ -82,6 +100,13 @@ class UserHandler {
     return User.find(this.query).exec();
   }
 
+
+
+
+  setPassword(pw) {
+    let user = new User();
+      this.user.password = user.generateHash(pw);
+      return this.user.password;
   /**
   *  @param pw, This is the password to be encrypted.
   *  @return The encrypted password for insertion to the db.

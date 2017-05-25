@@ -9,6 +9,7 @@ import jwt from './jwt';
 import projects from './projects';
 import secure from './secure';
 import test from './test';
+import search from './search';
 import verify from './verify';
 
 const routes = {
@@ -18,6 +19,7 @@ const routes = {
   '/projects': projects,
   '/secure': secure,
   '/test' : test,
+  '/search' : search,
   '/update': callbacks,
   '/verify': verify
 }
