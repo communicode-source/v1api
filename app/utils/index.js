@@ -6,44 +6,34 @@
  * Created at: 5/15/2017
  * A controller to handle logic for the Secure routes.
 **/
-import {default as isActive} from './activeUser';
-import {default as LoginUtility} from './userLogin';
-import {default as UpdateUtility} from './userUpdate';
+
+// This contain shared logic.
+import {LoginDataPull as userLogin} from './userLogin';
+// This is the logic for logging in a local user.
+import {verifyLocalLoginUser as localLogin} from './localLogin';
+// This is the logic for logging in an externally provider for user.
+import {verifyExternalUser as externalLogin} from './externalLogin';
+// This is the logic for creating a new local user.
+import {createLocalNewUser as localUserCreation} from './localCreation';
+// This is the logic for creating a new external user.
+import externalUserCreation from './externalCreation';
+// Specific logic for verifying Google tokens.
+import verifyGoogle from './googleVerifier';
+// Logic for ensuring the user is unique / in the database.
+import checkDB from './userCreation';
+// Specific logic for verifying facebook tokens.
+import verifyFacebook from './facebookVerifier';
 
 
-module.exports = {
 
-  CRUDUserBootstrap: {
-    verify : (req) => {
-      const token = req.userToken;
-      if(isActive(token) == false) {
-        return {err: true, msg: 'Invalid user token'};
-      }
-      return {err: false, msg: 'Token is valid'};
-    },
-
-    formatUpdateData: (req, secure = true) => {
-      const data = (secure == true) ? req.body.sanatized : req.body;
-
-      return userUpdate.lCaseIndex(data);
-    },
-
-    nameChangeProtection: async (tokenPayload, protectedData, dbHandler) => {
-      const containFoLName = ((protectedData.fname && protectedData.fname == tokenPayload.fname) || (protectedData.lname && protectedData.lname == tokenPayload.lname)) ? false : true;
-      if(containFoLName == false) {
-        return protectedData;
-      }
-      let fname = protectedData.fname || tokenPayload.fname;
-      let lname = protectedData.lname || tokenPayload.lname;
-
-      const set = await userUpdate.getSet(fname, lname, dbHandler.model)
-      const urlNum = getUrlNumber(set);
-      protectedData.url = fname+'.'+lname+toString(urlNum);
-      protectedData.urlnum = urlNum;
-      return protectedData;
-
-    },
-
-  },
-
+export let LoginDataPull = userLogin;
+export let isLocalUser = async (userToLogin, dbHandler) => {
+  const results = await checkDB(userToLogin, dbHandler, 1)
+  await localLogin(userToLogin, results, dbHandler)
+  return results
 }
+export let verifyExternalLoginUser = (params) => externalUserCreation(params, verifyGoogle, verifyFacebook)
+export let createExternalUser = (params) => externalUserCreation(params, verifyGoogle, verifyFacebook)
+export let uniqueUser = checkDB;
+export let ensureOnlyOne = (info, dbHandler) => checkDB(info, dbHandler, 1)
+export let createLocalUser = localUserCreation;
