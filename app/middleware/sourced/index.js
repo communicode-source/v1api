@@ -5,7 +5,7 @@ import {MongoClient} from 'mongodb';
 class Mongo {
   connect() {
     return new Promise((res, rej) => {
-      MongoClient.connect(config.url, (err, db) => {
+      MongoClient.connect(config.mongo.url, (err, db) => {
         if(err) {
           console.log('Did you forget to run Mongo?');
           res();

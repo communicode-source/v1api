@@ -1,5 +1,5 @@
 import https from 'https';
-import {facebook as cid} from './../../config/auth.json';
+import {facebook as cid} from './../../../config/auth.json';
 
 
 export default (accessToken, AT, email, name, id) => {

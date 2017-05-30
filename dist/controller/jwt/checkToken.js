@@ -74,9 +74,6 @@ var checkRules = function checkRules(payload, request) {
   if (payload.exp < new Date().getTime()) {
     return { err: true, msg: 'JWT has expired' };
   }
-  if (request.connection.remoteAddress !== payload.location) {
-    return { err: true, msg: 'Request did not come from same origin' };
-  }
   return { err: false, msg: payload };
 };
 

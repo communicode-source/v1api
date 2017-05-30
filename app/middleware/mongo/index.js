@@ -4,7 +4,7 @@ import bluebird from 'bluebird';
 
 module.exports = () => {
   mongoose.Promise = bluebird;
-  mongoose.connect(config.url);
+  mongoose.connect(config.mongo.url);
 
   mongoose.connection.on('error', () => {
     console.info("Could not run mongodb, did you forget to run mongod?");

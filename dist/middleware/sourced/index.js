@@ -28,12 +28,11 @@ var Mongo = function () {
       var _this = this;
 
       return new Promise(function (res, rej) {
-        _mongodb.MongoClient.connect(_database2.default.url, function (err, db) {
+        _mongodb.MongoClient.connect(_database2.default.mongo.url, function (err, db) {
           if (err) {
             console.log('Did you forget to run Mongo?');
             res();
           }
-          console.log('Reconnecting');
           _this.db = db;
           res();
         });

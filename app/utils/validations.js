@@ -8,21 +8,21 @@
 **/
 
 // This contain shared logic.
-import {LoginDataPull as userLogin} from './userLogin';
+import {LoginDataPull as userLogin} from './validations/userLogin';
 // This is the logic for logging in a local user.
-import {verifyLocalLoginUser as localLogin} from './localLogin';
+import {verifyLocalLoginUser as localLogin} from './validations/localLogin';
 // This is the logic for logging in an externally provider for user.
-import {verifyExternalUser as externalLogin} from './externalLogin';
+import {verifyExternalUser as externalLogin} from './validations/externalLogin';
 // This is the logic for creating a new local user.
-import {createLocalNewUser as localUserCreation} from './localCreation';
+import {createLocalNewUser as localUserCreation} from './validations/localCreation';
 // This is the logic for creating a new external user.
-import externalUserCreation from './externalCreation';
+import externalUserCreation from './validations/externalCreation';
 // Specific logic for verifying Google tokens.
-import verifyGoogle from './googleVerifier';
+import verifyGoogle from './validations/googleVerifier';
 // Logic for ensuring the user is unique / in the database.
-import checkDB from './userCreation';
+import checkDB from './validations/userCreation';
 // Specific logic for verifying facebook tokens.
-import verifyFacebook from './facebookVerifier';
+import verifyFacebook from './validations/facebookVerifier';
 
 
 

@@ -52,6 +52,26 @@ var UserHandler = function () {
     value: function find(query) {
       return this.model.findOne(query).exec();
     }
+  }, {
+    key: 'search',
+    value: function search(id) {
+      var array = id.split('');
+      id = array.join('.?'); // Add .? into string
+      var reg = new RegExp('.*' + id + '.*', 'i'); // Create RegExp
+      return this.model.find({ $or: [{ 'fname': reg }, { 'lname': reg }, { 'organizationname': reg }] }).exec(); // Search
+    }
+  }, {
+    key: 'dSearch',
+    value: function dSearch(id) {
+      var array = id[0].split('');
+      id[0] = array.join('.?'); // Add .? into first name
+      array = id[1].split('');
+      id[1] = array.join('.?'); // Add .? into second name
+      var fReg = new RegExp('.*' + id[0] + '.*', 'i'); // Create first RegExp
+      var lReg = new RegExp('.*' + id[1] + '.*', 'i'); // Create second RegExp
+      return this.model.find({ $or: [{ $and: [{ 'fname': fReg }, { 'lname': lReg }] }, { 'organizationname': fReg }] }).exec();
+    }
+
     /**
     *  @param data, this is what the user will be created with. It is optional so long as you have provided a this.user somewhere else.
     *  @return Mongoose Model of user, this is the user that you just saved.
@@ -116,7 +136,13 @@ var UserHandler = function () {
     value: function readUsers() {
       return _user2.default.find(this.query).exec();
     }
-
+  }, {
+    key: 'setPassword',
+    value: function setPassword(pw) {
+      var user = new _user2.default();
+      this.user.password = user.generateHash(pw);
+      return this.user.password;
+    }
     /**
     *  @param pw, This is the password to be encrypted.
     *  @return The encrypted password for insertion to the db.
@@ -125,7 +151,7 @@ var UserHandler = function () {
   }, {
     key: 'makePassword',
     value: function makePassword(pw) {
-      return _user2.default.generateHash(pw);
+      return new _user2.default().generateHash(pw);
     }
     /**
     *  @param pw, the password the user typed in.
@@ -135,8 +161,8 @@ var UserHandler = function () {
 
   }, {
     key: 'checkPassword',
-    value: function checkPassword(pw, userModel) {
-      return userModel.validPassword(pw);
+    value: function checkPassword(user, userModel) {
+      return userModel.validPassword(user.password);
     }
     /**
     *  This function resets the class for use with another user/query without have to do it manually or creating another handler instance.
