@@ -5,5 +5,6 @@ module.exports = mongoose.model('Certification', {
   inProgress: Boolean,
   email: String,
   dualfactor: String,
-  phonenumber: Number
+  phonenumber: Number,
+  authToken: String
 });

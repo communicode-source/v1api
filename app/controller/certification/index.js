@@ -2,7 +2,7 @@
 /**
  * @name certificationController
  * @author Daniel Adelfinsky
- * Last Edited at: 5/18/17
+ * Last Edited at: 5/30/17
  * A controller use to handle the logic for the certifications
 **/
 
@@ -11,14 +11,11 @@ import CertificationDBHandler from './../../db/handler/certification';
 import Response from '../Response'
 
 class CertificationController extends Response {
-
   /**
      * Index certification Controller - Logic for /certification route
      * @param req - Express Request object
      * @param res - Express Response object
     **/
-
-
   async index(req, res) {
     const dbHandler = new CertificationDBHandler();
 
@@ -33,8 +30,12 @@ class CertificationController extends Response {
 
     return new Response(data, statusCode);
   }
-
-  async certify(req, res) {
+  /**
+     * Certiify certification Controller - Logic for /certification/:id or /certification/certify/:id route
+     * @param req - Express Request object
+     * @param res - Express Response object
+    **/
+  async check(req, res) {
     const dbHandler = new CertificationDBHandler();
     const id = req.params.id;
 

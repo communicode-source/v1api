@@ -2,19 +2,17 @@
 /**
  * @name CertificationDBHandler
  * @author Daniel Adelfinsky
- * Last Edited at: 5/18/17
+ * Last Edited at: 5/30/17
  * A handler that holds all the functions for finding certifications
  **/
- var mongoose = require('mongoose');
-const Certification       = require('./../../model/certification');
+var mongoose         = require('mongoose');
+const Certification  = require('./../../model/certification');
 mongoose.Promise     = require('bluebird');
 
 
 class CertificationDBHandler {
 
-  /**
-   *Lists all Certifications in the certifications collections
-  **/
+  //lists all certifcations in db
   findAll() {
     return Certification.find({}).exec();
   }
