@@ -33,7 +33,7 @@ class UserController extends Response {
 
       // Create the status code and the user JWT as data.
       status = this.statusCode['success']
-      data = jwt.generate(LoginDataPull(uniqueUser))
+      data = jwt.generate(LoginDataPull(user))
 
     } catch(e) {
       console.log(e)
