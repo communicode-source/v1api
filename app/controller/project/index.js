@@ -1,4 +1,4 @@
- haimport ProjectHandler from './../../db/handler/project';
+import ProjectHandler from './../../db/handler/project';
 import ActivityFeedHandler from './../../db/handler/activityfeed';
 import Response from '../Response';
 
