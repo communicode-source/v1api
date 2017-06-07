@@ -12,7 +12,7 @@ import Response from './../Response.js'
 // Require the Handler for the user.
 import UserHandler from './../../db/handler/user'
 // Utilities for the logins and sign ups because they contain a lot of logic.
-import {LoginDataPull, verifyExternalLoginUser, isLocalUser, createLocalUser, createExternalUser, uniqueUser, ensureOnlyOne} from './../../utils'
+import {LoginDataPull, verifyExternalLoginUser, isLocalUser, createLocalUser, createExternalUser, uniqueUser, ensureOnlyOne} from './../../utils/validations'
 
 
 class UserController extends Response {
@@ -30,10 +30,10 @@ class UserController extends Response {
 
       // Gets the user from the database and does checking to ensure passwords match, etc.
       user = (isLocal) ? await isLocalUser(user, dbHandler) : await uniqueUser(await createExternalUser(contents), dbHandler, 1)
-      console.log(user)
+
       // Create the status code and the user JWT as data.
       status = this.statusCode['success']
-      data = jwt.generate(LoginDataPull(uniqueUser))
+      data = jwt.generate(LoginDataPull(user))
 
     } catch(e) {
       console.log(e)
