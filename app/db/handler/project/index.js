@@ -1,9 +1,7 @@
 'use strict'
 
-const mongoose       = require('mongoose');
-const Project        = require('./../../model/project');
-mongoose.Promise     = require('bluebird');
-
+import Project from './../../model/project';
+import Bookmark from './../../model/project/bookmark';
 
 class ProjectHandler {
 
@@ -31,6 +29,13 @@ class ProjectHandler {
   **/
   find(query) {
     return Project.find(query).exec();
+  }
+
+  bookmark(user, project) {
+    return new Bookmark({
+      userId: user,
+      projectId: project
+    }).save();
   }
 
 }

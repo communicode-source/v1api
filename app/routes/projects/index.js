@@ -21,4 +21,12 @@ router.route('/:id')
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
+router.route('/bookmark')
+
+  .post( async (req, res) => {
+    const response = await controller.bookmark(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+  });
+
 export default router;

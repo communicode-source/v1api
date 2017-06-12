@@ -1,5 +1,5 @@
 import GoogleAuth from 'google-auth-library';
-import {google as cid} from './../../config/auth.json';
+import {google as cid} from './../../../config/auth.json';
 
 
 export default (accessToken, AT) => {
