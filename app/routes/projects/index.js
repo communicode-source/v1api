@@ -11,6 +11,12 @@ router.route('/')
     const response = await controller.index(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
+  })
+
+  .post( async (req, res) => {
+    const response = await controller.createProject(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
 router.route('/:id')

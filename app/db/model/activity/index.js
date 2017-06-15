@@ -7,4 +7,5 @@ const Activity = mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+
 module.exports = mongoose.model('Activity', Activity);

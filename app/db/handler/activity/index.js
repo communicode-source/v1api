@@ -9,10 +9,11 @@ import redis from '../../helpers/redis';
 import Pipeline from '../../../utils/pipeline';
 
 import Activity from '../../model/activity';
+import ConnectionHandler from '../../handler/connection';
 
 class ActivityFeedHandler {
 
-  addActivity(activity) {
+  async addActivity(activity) {
 
     const newActivity = new Activity({
       actor: activity.actor,
@@ -20,16 +21,27 @@ class ActivityFeedHandler {
       object: activity.object
     });
 
-    newActivity.save();
+    let savedActivity;
 
-    return new Pipeline('activity.eventualId', {
-      activity: activity,
-      addToFeed: this.addToFeed
+    try {
+      savedActivity = await newActivity.save();
+    } catch(e) {
+      console.log(e);
+    }
+
+    return new Pipeline(savedActivity._id, {
+      activity: savedActivity,
+      addToFeed: this.addToFeed,
+      graphSearchHandler: new ConnectionHandler()
     });
   }
 
-  addToFeed(activity) {
-    console.log('Adding to feed here... ' + JSON.stringify(activity));
+  async addToFeed(activity, graphSearchHandler) {
+    const userFeeds = await graphSearchHandler.getAllFollowersForUser(activity.actor);
+
+    for(let i = 0; i < userFeeds.length; i++) {
+      redis.lpush('feed.' + userFeeds[i].object, activity._id);
+    }
   }
 
 }

@@ -41,32 +41,60 @@ class ProjectController extends Response {
     return new Response(data, statusCode);
   }
 
+  async createProject(req, res) {
+    const dbHandler = new ProjectHandler();
+
+    let data, statusCode;
+
+    try {
+      data = await dbHandler.create(req.body);
+      statusCode = this.statusCode['success'];
+    } catch(e) {
+      data = await dbHandler.create(req.body);
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
+
   async bookmark(req, res) {
     const dbHandler = new ProjectHandler();
     const activity = new ActivityFeedHandler();
 
-    let data, statusCode, pipe;
+    let data, statusCode, pipe, nonprofit;
 
     try {
       data = await dbHandler.bookmark(req.body.user, req.body.project);
+      nonprofit = await dbHandler.getNonprofitFromProject(req.body.project);
 
-      pipe = activity.addActivity({
-        actor: req.body.user,
-        verb: 'bookmarked',
-        object: req.body.project
-      }).through({
-          addToFeed: (request) => {
-            request.addToFeed(request.activity);
-          }
-      });
+      if(nonprofit.nonprofitId) {
+
+        pipe = await activity.addActivity({
+          actor: req.body.user,
+          verb: 'bookmarked',
+          object: req.body.project,
+        });
+
+        pipe.handle({
+          nonprofitId: nonprofit.nonprofitId
+        }).through({
+            createConnection: async (request) => {
+              await request.graphSearchHandler.create(request.activity.actor, request.nonprofitId, .05, false);
+            },
+            addToFeed: (request) => {
+              request.addToFeed(request.activity, request.graphSearchHandler);
+            }
+        }).dispatch(['createConnection', 'addToFeed']);
+      }
 
       statusCode = this.statusCode['success'];
+
     } catch(err) {
-      data = await dbHandler.findAll();
+      console.log(err);
+      data = { msg: 'Something went wrong' };
       statusCode = this.statusCode['not found'];
     }
 
-    pipe.dispatch(['addToFeed']);
     return new Response(data, statusCode);
   }
 

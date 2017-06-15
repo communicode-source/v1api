@@ -5,11 +5,11 @@ var Project = mongoose.Schema({
   title: String,
   description: String,
   projectType: String,
-  imageUpload: String,
+  images: Array,
   types: Array,
   skills: Array,
   estimatedTime: String,
-  createdAt: Date
+  createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Project', Project);

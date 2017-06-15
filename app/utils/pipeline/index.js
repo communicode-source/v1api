@@ -14,9 +14,9 @@ class Pipeline {
   }
 
   // Do we need this tho ?
+  // yes
   handle(addToRequest) {
     this.pipeline.data = Object.assign({}, this.pipeline.data, addToRequest);
-
     return this;
   }
 

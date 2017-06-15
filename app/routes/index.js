@@ -11,6 +11,7 @@ import secure from './secure';
 import test from './test';
 import search from './search';
 import verify from './verify';
+import connection from './connection';
 
 const routes = {
   '/'     : home,
@@ -21,7 +22,8 @@ const routes = {
   '/test' : test,
   '/search' : search,
   '/update': callbacks,
-  '/verify': verify
+  '/verify': verify,
+  '/connection': connection
 }
 
 export default (app) => {

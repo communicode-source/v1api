@@ -22,6 +22,19 @@ class ProjectHandler {
     return Project.findById(id).exec();
   }
 
+  create(project) {
+    return new Project({
+      nonprofitId: project.nonprofitId,
+      title: project.title,
+      description: project.description,
+      projectType: project.projectType,
+      images: project.images,
+      types: project.types,
+      skills: project.skills,
+      estimatedTime: project.estimatedTime
+    }).save();
+  }
+
   /**
    * find()
    * @param query - the mongoose query to run.
@@ -29,6 +42,10 @@ class ProjectHandler {
   **/
   find(query) {
     return Project.find(query).exec();
+  }
+
+  getNonprofitFromProject(projectId) {
+    return Project.findById(projectId).exec();
   }
 
   bookmark(user, project) {
