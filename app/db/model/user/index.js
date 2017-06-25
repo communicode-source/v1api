@@ -2,7 +2,7 @@ const bcrypt   = require('bcrypt-nodejs');
 const mongoose = require("mongoose");
 
 let User = mongoose.Schema({
-  accounttype      : {type: Boolean, default:     null},
+  accountType      : {type: Boolean, default:     null},
   datejoined       : {type: Date,    default: Date.now},
   email            : {type: String,  required:    true},
   fname            : {type: String,  default:     null},

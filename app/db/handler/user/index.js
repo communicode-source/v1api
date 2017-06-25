@@ -37,20 +37,20 @@ class UserHandler {
   }
 
   search(id) {
-	let array = id.split('');
-	id = array.join('.?'); // Add .? into string
-	const reg = new RegExp('.*'  + id + '.*', 'i'); // Create RegExp
-	return this.model.find({$or:[ {'fname': reg}, {'lname': reg}, {'organizationname' : reg}]}).exec(); // Search
+  	let array = id.split('');
+  	id = array.join('.?'); // Add .? into string
+  	const reg = new RegExp('.*'  + id + '.*', 'i'); // Create RegExp
+  	return this.model.find({$or:[ {'fname': reg}, {'lname': reg}, {'organizationname' : reg}]}).exec(); // Search
   }
 
   dSearch(id) {
-	let array = id[0].split('');
-	id[0] = array.join('.?'); // Add .? into first name
-	array = id[1].split('');
-	id[1] = array.join('.?'); // Add .? into second name
-	const fReg = new RegExp('.*' + id[0] + '.*', 'i'); // Create first RegExp
-	const lReg = new RegExp('.*' + id[1] + '.*', 'i'); // Create second RegExp
-	return this.model.find({$or: [{$and:[ {'fname': fReg}, {'lname': lReg}]}, {'organizationname': fReg}]}).exec();
+  	let array = id[0].split('');
+  	id[0] = array.join('.?'); // Add .? into first name
+  	array = id[1].split('');
+  	id[1] = array.join('.?'); // Add .? into second name
+  	const fReg = new RegExp('.*' + id[0] + '.*', 'i'); // Create first RegExp
+  	const lReg = new RegExp('.*' + id[1] + '.*', 'i'); // Create second RegExp
+  	return this.model.find({$or: [{$and:[ {'fname': fReg}, {'lname': lReg}]}, {'organizationname': fReg}]}).exec();
   }
 
   /**
@@ -74,7 +74,7 @@ class UserHandler {
   *  @return Promise, mongoose promise that returns the status fromt he db.
   **/
   updateUser(id, things) {
-    return User.update({_id: (id || this.user._id)}, {$set: things}).exec()
+    return User.update({_id: (id || this.user._id)}, { $set: things }, {"multi": true}).exec()
   }
   /**
   *  WARNING There is no safety in place here to ensure that everything goes as it should.
@@ -99,9 +99,6 @@ class UserHandler {
   readUsers() {
     return User.find(this.query).exec();
   }
-
-
-
 
   setPassword(pw) {
     let user = new User();

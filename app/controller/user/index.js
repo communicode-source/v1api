@@ -13,6 +13,8 @@ import Response from './../Response.js'
 import UserHandler from './../../db/handler/user'
 // Utilities for the logins and sign ups because they contain a lot of logic.
 import {LoginDataPull, verifyExternalLoginUser, isLocalUser, createLocalUser, createExternalUser, uniqueUser, ensureOnlyOne} from './../../utils/validations'
+import ActivityFeedHandler from './../../db/handler/activity';
+import mongoose from 'mongoose';
 
 
 class UserController extends Response {
@@ -49,9 +51,11 @@ class UserController extends Response {
       // Declarations of constants
       const contents = req.body.sanitized
       const dbHandler = new UserHandler()
+      const activity = new ActivityFeedHandler()
       const isLocal = (req.body.sanitized.provider === 'local')
       // Declarations of  variables
-      let status, data, newUser
+      let status, data, newUser, pipe
+
 
       try {
         // Getting the user Json from the req.
@@ -66,6 +70,21 @@ class UserController extends Response {
         status = this.statusCode['success']
         data = jwt.generate(LoginDataPull(newUser))
 
+        pipe = await activity.addActivity({
+          actor: newUser._id,
+          verb: 'created',
+          object: newUser._id,
+        });
+
+        pipe.through({
+            createConnection: async (request) => {
+              await request.graphSearchHandler.create(request.activity.actor, request.activity.object, 1.00, true);
+            },
+            addToFeed: (request) => {
+              request.addToFeed(request.activity, request.graphSearchHandler);
+            }
+        }).dispatch(['createConnection', 'addToFeed']);
+
       } catch(e) {
         console.log(e)
         status = this.statusCode['success']
@@ -73,6 +92,37 @@ class UserController extends Response {
       }
 
       return new Response(data, status)
+    }
+
+    async updateFirstAndLastName(req, res) {
+      const dbHandler = new UserHandler();
+
+      const fname = req.body.sanitized.fname;
+      const lname = req.body.sanitized.lname;
+
+      let modified, data, statusCode;
+
+      try {
+          modified = await dbHandler.updateUser(req.body.user.profile._id, { fname: fname, lname: lname });
+          data = {
+            ...req.body.user.profile,
+            fname: fname,
+            lname: lname
+          };
+          if(modified) {
+            data = jwt.generate(data);
+            statusCode = this.statusCode['success'];
+          } else {
+            throw new Error('Not modified');
+          }
+
+      } catch(e) {
+          console.log(e);
+          data = 100;
+          statusCode = this.statusCode['error'];
+      }
+
+      return new Response(data, statusCode);
     }
 
 }

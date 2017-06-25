@@ -2,7 +2,7 @@
 
 export let createLocalNewUser = (params, handle) => {
   const fields           = ['email',
-                            'accounttype',
+                            'accountType',
                             'provider',
                             'password',
                             'fname',

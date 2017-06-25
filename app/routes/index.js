@@ -12,6 +12,7 @@ import test from './test';
 import search from './search';
 import verify from './verify';
 import connection from './connection';
+import user from './user';
 
 const routes = {
   '/'     : home,
@@ -23,7 +24,8 @@ const routes = {
   '/search' : search,
   '/update': callbacks,
   '/verify': verify,
-  '/connection': connection
+  '/connection': connection,
+  '/user': user
 }
 
 export default (app) => {

@@ -32,7 +32,7 @@ export default class ConnectionHandler {
 
     return new Connection({
       actor: actor,
-      object: following,
+      object: object,
       affinity: affinity,
       isFollowing: isFollowing
     }).save();
@@ -45,5 +45,4 @@ export default class ConnectionHandler {
   calculateNewAffinity(currAffinity, newAffinity) {
     return currAffinity + (currAffinity*newAffinity);
   }
-
 }
