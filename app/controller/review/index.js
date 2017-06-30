@@ -3,7 +3,7 @@
 /**
  * @name ReviewController
  * @author Daniel Adelfinsky
- * Last Edited at: 6/29/17
+ * Last Edited at: 6/30/17
  * A controller use to handle the logic for Reviews
 **/
 
@@ -19,7 +19,6 @@ class ReviewController extends Response {
      * @param res - Express Response object
     **/
 
-
   async index(req, res) {
     const dbHandler = new ReviewDBHandler();
 
@@ -34,6 +33,12 @@ class ReviewController extends Response {
 
     return new Response(data, statusCode);
   }
+
+  /**
+     * Index review Controller - Logic for /review route
+     * @param req - Express Request object
+     * @param res - Express Response object
+    **/
 
   async getReview(req, res) {
     const dbHandler = new ReviewDBHandler();
@@ -51,8 +56,15 @@ class ReviewController extends Response {
     return new Response(data, statusCode);
   }
 
+  /**
+     * Index review Controller - Logic for /review route
+     * @param req - Express Request object
+     * @param res - Express Response object
+    **/
+
   async makeReview(req, res) {
     const dbHandler = new ReviewDBHandler();
+    const id = req.params.id;
 
     let data, statusCode;
     try {
@@ -65,6 +77,73 @@ class ReviewController extends Response {
 
     return new Response(data, statusCode);
   }
+
+  /**
+     * Index review Controller - Logic for /review route
+     * @param req - Express Request object
+     * @param res - Express Response object
+    **/
+
+  async updateRating(req, res) {
+    const dbHandler = new ReviewDBHandler();
+    const id = req.params.id;
+
+    let data, statusCode;
+    try {
+      data = await dbHandler.update(id,req.body);
+      statusCode = this.statusCode['success'];
+    } catch(err) {
+      data = await dbHandler.update(id,req.body);
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
+
+  /**
+     * Index review Controller - Logic for /review route
+     * @param req - Express Request object
+     * @param res - Express Response object
+    **/
+
+  async updateReview(req, res) {
+    const dbHandler = new ReviewDBHandler();
+    const id = req.params.id;
+
+    let data, statusCode;
+    try {
+      data = await dbHandler.update(id,req.body);
+      statusCode = this.statusCode['success'];
+    } catch(err) {
+      data = await dbHandler.update(id,req.body);
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
+
+  /**
+     * Index review Controller - Logic for /review route
+     * @param req - Express Request object
+     * @param res - Express Response object
+    **/
+
+  async removeReview(req, res) {
+    const dbHandler = new ReviewDBHandler();
+    const id = req.params.id;
+
+    let data, statusCode;
+    try {
+      data = await dbHandler.remove(id);
+      statusCode = this.statusCode['success'];
+    } catch(err) {
+      data = await dbHandler.remove(id);
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
+
 
 }
 export default new ReviewController();

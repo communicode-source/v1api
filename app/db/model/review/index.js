@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 var Review = mongoose.Schema({
   volunteer_id: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
   nonprofit_id: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
-  rating: Number,
+  rating: String,
   projectType: String,
   review: String,
   createdAt: { type: Date, default: Date.now }
