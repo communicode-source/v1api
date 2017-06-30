@@ -9,7 +9,11 @@ const Review = require('./../../model/review');
 
 class ReviewDBHandler {
 
-  //lists all certifcations in db
+  /**
+   * findAll()
+   * Returns all the reviews about an individual from the collection
+   **/
+
   findAll() {
     return Review.find({}).exec();
   }
@@ -36,6 +40,15 @@ class ReviewDBHandler {
       review: review.review,
       createdAt: review.createdAt
     }).save();
+  }
+
+  /**
+   * find()
+   * @param query - the mongoose query to run.
+   * Returns project(s) from collection by custom query
+  **/
+  find(query) {
+    return Project.find(query).exec();
   }
 }
 

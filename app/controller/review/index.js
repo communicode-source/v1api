@@ -1,4 +1,5 @@
 'use strict'
+
 /**
  * @name ReviewController
  * @author Daniel Adelfinsky
@@ -64,5 +65,6 @@ class ReviewController extends Response {
 
     return new Response(data, statusCode);
   }
+
 }
 export default new ReviewController();

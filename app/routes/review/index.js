@@ -8,7 +8,7 @@
 
 import express, { Router } from 'express';
 
-//Require the certificationController
+//Require the ReviewController
 import controller from './../../controller/review';
 
 
@@ -51,7 +51,7 @@ router.route('/update')
 router.route('/remove')
 
   .delete( async (req, res) => {
-    const response = await controller.makeReview(req, res);
+    const response = await controller.getReview(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
   })
