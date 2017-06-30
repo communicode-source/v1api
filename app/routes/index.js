@@ -13,6 +13,7 @@ import search from './search';
 import verify from './verify';
 import connection from './connection';
 import user from './user';
+import review from './review';
 
 const routes = {
   '/'     : home,
@@ -25,7 +26,8 @@ const routes = {
   '/update': callbacks,
   '/verify': verify,
   '/connection': connection,
-  '/user': user
+  '/user': user,
+  '/reviews': review
 }
 
 export default (app) => {
