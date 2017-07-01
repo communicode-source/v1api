@@ -20,10 +20,10 @@ class JWTController {
    * @param payload - JSON to be encoded.
    * @return JWS - Signed JWT token for distribution.
   **/
-  generate(payload) {
+  generate(payload, time = 15) {
     return {
       err: false,
-      msg: genToken(payload)
+      msg: genToken(payload, time)
     };
   }
 

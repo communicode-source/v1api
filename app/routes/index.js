@@ -7,9 +7,10 @@ import certifications from './certification';
 import home from './home';
 import jwt from './jwt';
 import projects from './projects';
+import recover from './recover';
 import secure from './secure';
-import test from './test';
 import search from './search';
+import test from './test';
 import verify from './verify';
 import connection from './connection';
 import user from './user';
@@ -19,9 +20,10 @@ const routes = {
   '/certifications': certifications,
   '/jwt'  : jwt,
   '/projects': projects,
+  '/recover': recover,
   '/secure': secure,
-  '/test' : test,
   '/search' : search,
+  '/test' : test,
   '/update': callbacks,
   '/verify': verify,
   '/connection': connection,
