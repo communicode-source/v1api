@@ -16,12 +16,12 @@ class Recover extends Response {
 
             let user = await dbUserHandler.addQuery({email: req.body.email}).readUsers();
             if(user.length !== 1) {
-                throw new Error('Unexpected number of users in the DB');
+                throw new Error(600);
             }
             user = user[0];
             const checkPreviousDistributions = await dbRecoveryHandler.checkUser(user._id);
             if(checkPreviousDistributions.length !== 0) {
-                throw new Error('User already requested password change');
+                throw new Error(605);
             }
             const userHash = await crypto.randomBytes(12).toString('hex');
             data = {
@@ -29,17 +29,13 @@ class Recover extends Response {
                 hash: userHash
             }
             const url = await crypto.randomBytes(12).toString('hex');
-
-            const mail = new Mailer([user.email], 'Password recovery').html(`<a href=http://localhost:3001/password/recovery?hash=${url}>Follow this link to reset your password</a>`).sendMail();
-
-            await dbRecoveryHandler.insertHash(url, userHash, user._id);
+            const html = `<html><h4>Code: ${url}</h4><p>Copy and paste this into the next textbox</p> </html>`;
+            const mail = await new Mailer([user.email], 'Password recovery').html(html).sendMail();
+            const record = await dbRecoveryHandler.insertHash(url, userHash, user._id);
 
         } catch(e) {
             console.log(e);
-            data = {
-                err: true,
-                msg: 'Something went wrong'
-            }
+            data = (['600', '605'].indexOf(e.message) !== -1) ? e.message : {err: true, msg: 'There was an error'};
         }
 
         return new Response(data, 200);
@@ -56,7 +52,7 @@ class Recover extends Response {
 
             let map = await dbRecoveryHandler.findHash(urlHash, userHash);
             if(map.length !== 1) {
-                throw new Error('No hash found');
+                throw new Error(601);
             }
             map = map[0];
             specialJWTPayload = {
@@ -86,16 +82,16 @@ class Recover extends Response {
         try {
             const userToken = await jwt.check(req.body.jwt);
             if(userToken.msg.verifiedForChange !== true) {
-                throw new Error('Not verified');
+                throw new Error(610);
             }
             let recoveryData = await dbRecoveryHandler.getUserID(userToken.msg.id);
             if(recoveryData.length !== 1) {
-                throw new Error('No matching user');
+                throw new Error(611);
             }
             recoveryData = recoveryData[0];
             let user = await dbUserHandler.addQuery({_id: recoveryData.userID}).readUsers();
             if(user.length !== 1) {
-                throw new Error('User nonexistent');
+                throw new Error(612);
             }
             user = user[0];
             user.password = dbUserHandler.makePassword(req.body.sanitized.password);
@@ -108,10 +104,7 @@ class Recover extends Response {
             recoveryData.save();
         } catch(e) {
             console.log(e);
-            data = {
-                err: true,
-                msg: 'Something went wrong'
-            };
+            data = (['610', '611', '612'].indexOf(e.message) !== -1) ? e.message : {err: true, msg: 'There was an error'};
         }
 
         return new Response(data, 200);

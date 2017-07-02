@@ -55,10 +55,14 @@ class Mailer {
 
 	sendMail()
 	{
-		this.transporter.sendMail(this.mailOptions, (error, info) => {
-			if (error) {
-				return console.log(error);
-			}
+		return new Promise((resolve, reject) => {
+				this.transporter.sendMail(this.mailOptions, (error, info) => {
+						if (error) {
+								console.log(error);
+								return reject(error);
+						}
+						return resolve();
+				});
 		});
 	}
 };
