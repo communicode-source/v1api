@@ -12,7 +12,7 @@ export let LoginDataPull = user => {
     interests: user.interests,
     skills: user.skills,
     nonprofittype: user.nonprofittype,
-    accounttype: user.accounttype,
+    accountType: user.accountType,
     organizationname: user.organizationname
   }
 }

@@ -99,15 +99,17 @@ class UserController extends Response {
 
       const fname = req.body.sanitized.fname;
       const lname = req.body.sanitized.lname;
-
+      const organizationname = req.body.sanitized.organizationname;
+      console.log(organizationname);
       let modified, data, statusCode;
 
       try {
-          modified = await dbHandler.updateUser(req.body.user.profile._id, { fname: fname, lname: lname });
+          modified = await dbHandler.updateUser(req.body.user.profile._id, { fname: fname, lname: lname, organizationname: organizationname });
           data = {
             ...req.body.user.profile,
             fname: fname,
-            lname: lname
+            lname: lname,
+            organizationname: organizationname
           };
           if(modified) {
             data = jwt.generate(data);
