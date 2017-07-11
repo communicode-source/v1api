@@ -14,8 +14,7 @@ let User = mongoose.Schema({
   provider         : {type: String,  required:    true},
   providerid       : {type: String,  default:     null},
   skills           : {type: Object,  default:       {}},
-  url              : {type: String,  default:     null},
-  urlnum           : {type: Number,  default:     null}
+  url              : {type: String,  default:     null}
 });
 User.methods.generateHash = function(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);

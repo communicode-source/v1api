@@ -120,6 +120,11 @@ class UserHandler {
   checkPassword(user, userModel) {
     return userModel.validPassword(user.password)
   }
+
+  findAllUsersWithFirstAndLast(fname, lname) {
+    return User.count({fname: fname, lname: lname}).exec();
+  }
+
   /**
   *  This function resets the class for use with another user/query without have to do it manually or creating another handler instance.
   *  @param extent, true/false. Whether or not to clear this.user

@@ -100,17 +100,24 @@ class UserController extends Response {
       const fname = req.body.sanitized.fname;
       const lname = req.body.sanitized.lname;
       const organizationname = req.body.sanitized.organizationname;
-      console.log(organizationname);
-      let modified, data, statusCode;
+      let modified, numberOfSimilarUsers, data, statusCode, profileURL;
 
       try {
-          modified = await dbHandler.updateUser(req.body.user.profile._id, { fname: fname, lname: lname, organizationname: organizationname });
+          // Find # of users to tell how to construct the profile url
+          numberOfSimilarUsers = await dbHandler.findAllUsersWithFirstAndLast(fname, lname);
+
+          profileURL = this.createProfileURL(numberOfSimilarUsers, fname, lname, req.body.user.profile._id);
+
+          modified = await dbHandler.updateUser(req.body.user.profile._id, { fname: fname, lname: lname, organizationname: organizationname, url: profileURL });
+
           data = {
             ...req.body.user.profile,
             fname: fname,
             lname: lname,
-            organizationname: organizationname
+            organizationname: organizationname,
+            url: profileURL
           };
+
           if(modified) {
             data = jwt.generate(data);
             statusCode = this.statusCode['success'];
@@ -127,6 +134,27 @@ class UserController extends Response {
       return new Response(data, statusCode);
     }
 
+    createProfileURL(numberOfSimilarUsers, fname, lname, id) {
+        let profileURL;
+
+        if(numberOfSimilarUsers == 0) {
+          return (fname + "." + lname).toLowerCase();
+        }
+
+        if(numberOfSimilarUsers == 1) {
+          return (fname + "-" + lname).toLowerCase();
+        }
+
+        if(numberOfSimilarUsers == 2) {
+          return (lname + "." + fname).toLowerCase();
+        }
+
+        if(numberOfSimilarUsers == 3) {
+          return (lname + "-" + fname).toLowerCase();
+        }
+
+        return id;
+    }
 }
 
 export let controller = new UserController()
