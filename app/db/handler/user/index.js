@@ -125,6 +125,10 @@ class UserHandler {
     return User.count({fname: fname, lname: lname}).exec();
   }
 
+  getProfileByUrl(url) {
+    return User.findOne({'url': url}).exec();
+  }
+
   /**
   *  This function resets the class for use with another user/query without have to do it manually or creating another handler instance.
   *  @param extent, true/false. Whether or not to clear this.user
@@ -142,4 +146,5 @@ class UserHandler {
   }
 
 }
-module.exports = UserHandler;
+
+export default UserHandler;

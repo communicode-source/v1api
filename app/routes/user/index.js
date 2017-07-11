@@ -5,6 +5,14 @@ import { controller } from './../../controller/user';
 
 const router = express.Router();
 
+router.route('/:url')
+
+  .get( async (req, res) => {
+    const response = await controller.getUserProfile(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+  });
+
 router.route('/update/name/:id')
 
   .put( async (req, res) => {

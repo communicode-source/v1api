@@ -19,6 +19,23 @@ import mongoose from 'mongoose';
 
 class UserController extends Response {
 
+  async getUserProfile(req, res) {
+    const url = req.params.url;
+    const dbHandler = new UserHandler();
+
+    let statusCode, data;
+
+    try {
+      data = await dbHandler.getProfileByUrl(url);
+      statusCode = this.statusCode['success'];
+    } catch(e) {
+      data = await dbHandler.getProfileByUrl(url);
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
+
   async loginUser(req, res) {
     // Declarations of constants
     const contents = req.body.sanitized
@@ -138,7 +155,7 @@ class UserController extends Response {
         let profileURL;
 
         if(numberOfSimilarUsers == 0) {
-          return (fname + "." + lname).toLowerCase();
+          return (fname + lname).toLowerCase();
         }
 
         if(numberOfSimilarUsers == 1) {
@@ -146,7 +163,7 @@ class UserController extends Response {
         }
 
         if(numberOfSimilarUsers == 2) {
-          return (lname + "." + fname).toLowerCase();
+          return (lname + fname).toLowerCase();
         }
 
         if(numberOfSimilarUsers == 3) {
