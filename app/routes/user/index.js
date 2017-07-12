@@ -5,7 +5,7 @@ import { controller } from './../../controller/user';
 
 const router = express.Router();
 
-router.route('/:url')
+router.route('/profile/:url')
 
   .get( async (req, res) => {
     const response = await controller.getUserProfile(req, res);
