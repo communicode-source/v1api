@@ -19,7 +19,15 @@ router.route('/update/name/:id')
     const response = await controller.updateFirstAndLastName(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
-  })
+  });
+
+router.route('/update/interests/:id')
+
+  .put( async (req, res) => {
+    const response = await controller.updateInterests(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+  });
 
 
 export default router;
