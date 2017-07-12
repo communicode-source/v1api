@@ -151,6 +151,33 @@ class UserController extends Response {
       return new Response(data, statusCode);
     }
 
+    async updateInterests(req, res) {
+        const dbHandler = new UserHandler(req, res);
+        const interests = req.body.sanitized.interests;
+        let modified, data, statusCode;
+
+        data = {
+            interests, interests
+	};
+
+        try {
+            modified = await dbHandler.updateUser(req.body._id, { interests: interests });
+            if (modified) {
+                data = jwt.generate(data);
+                statusCode = this.statusCode['success'];
+	    } else {
+                throw new Error('Not modified');
+            }
+
+        } catch(e) {
+            console.log(e);
+            data = 100;
+            statusCode = this.statusCode['error'];
+        }
+	
+        return new Response(data, statusCode);
+    }
+
     createProfileURL(numberOfSimilarUsers, fname, lname, id) {
         let profileURL;
 
