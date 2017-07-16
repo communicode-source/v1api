@@ -123,7 +123,7 @@ class UserController extends Response {
           // Find # of users to tell how to construct the profile url
           numberOfSimilarUsers = await dbHandler.findAllUsersWithFirstAndLast(fname, lname);
 
-          profileURL = this.createProfileURL(numberOfSimilarUsers, fname, lname, req.body.user.profile._id);
+          profileURL = this.createProfileURL(numberOfSimilarUsers, fname, lname, organizationname, req.body.user.profile._id);
 
           modified = await dbHandler.updateUser(req.body.user.profile._id, { fname: fname, lname: lname, organizationname: organizationname, url: profileURL });
 
@@ -180,26 +180,30 @@ class UserController extends Response {
       return new Response(data, statusCode);
     }
 
-    createProfileURL(numberOfSimilarUsers, fname, lname, id) {
+    createProfileURL(numberOfSimilarUsers, fname, lname, organizationname, id) {
         let profileURL;
 
-        if(numberOfSimilarUsers == 0) {
-          return (fname + lname).toLowerCase();
+        if(!organizationname) {
+          if(numberOfSimilarUsers == 0) {
+            return (fname + lname).toLowerCase();
+          }
+
+          if(numberOfSimilarUsers == 1) {
+            return (fname + "-" + lname).toLowerCase();
+          }
+
+          if(numberOfSimilarUsers == 2) {
+            return (lname + fname).toLowerCase();
+          }
+
+          if(numberOfSimilarUsers == 3) {
+            return (lname + "-" + fname).toLowerCase();
+          }
+
+          return id;
         }
 
-        if(numberOfSimilarUsers == 1) {
-          return (fname + "-" + lname).toLowerCase();
-        }
-
-        if(numberOfSimilarUsers == 2) {
-          return (lname + fname).toLowerCase();
-        }
-
-        if(numberOfSimilarUsers == 3) {
-          return (lname + "-" + fname).toLowerCase();
-        }
-
-        return id;
+        return organizationname.replace(/\s/g, '').toLowerCase();
     }
 }
 
