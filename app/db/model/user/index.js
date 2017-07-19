@@ -13,9 +13,14 @@ let User = mongoose.Schema({
   password         : {type: String,  default:     null},
   provider         : {type: String,  required:    true},
   providerid       : {type: String,  default:     null},
-  skills           : {type: Object,  default:       {}},
+  skills           : {type: Array,   default:     null},
+  biography        : {type: String,  default:     null},
+  location         : {type: String,  default:     null},
+  social           : {type: Object,  default:     null},
+  job              : {type: String,  default:     null},
   url              : {type: String,  default:     null}
 });
+
 User.methods.generateHash = function(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };

@@ -153,12 +153,12 @@ class UserController extends Response {
 
     async updateInterests(req, res) {
       const dbHandler = new UserHandler(req, res);
-      const interests = req.body.sanitized.interests;
+      const interests = req.body.sanitized.interests.split(',');
       let modified, data, statusCode;
 
       data = {
         ...req.body.user,
-        interests: req.body.sanitized.interests.split(',')
+        interests: interests
       };
 
       try {
