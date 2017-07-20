@@ -5,10 +5,16 @@ var Project = mongoose.Schema({
   title: String,
   description: String,
   projectType: String,
-  images: Array,
-  types: Array,
+  image: Object,
+  item: String,
+  type: String,
+  interests: Array,
   skills: Array,
-  estimatedTime: String,
+  startTime: String,
+  endTime: String,
+  developerCost: Number,
+  totalCost: Number,
+  isDraft: { type: Boolean, default: 1 },
   createdAt: { type: Date, default: Date.now }
 });
 
