@@ -25,14 +25,12 @@ class ProjectHandler {
   create(project) {
     return new Project({
       nonprofitId: project.nonprofitId,
-      title: project.title,
-      description: project.description,
-      projectType: project.projectType,
-      images: project.images,
-      types: project.types,
-      skills: project.skills,
-      estimatedTime: project.estimatedTime
+      item: project.item
     }).save();
+  }
+
+  updateById(id, project) {
+    return Project.update({"_id": id}, { $set: project }).exec();
   }
 
   /**

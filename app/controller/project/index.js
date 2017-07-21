@@ -2,6 +2,7 @@
 
 import ProjectHandler from './../../db/handler/project';
 import Response from '../Response';
+import jwt from './../jwt'
 
 import ActivityFeedHandler from './../../db/handler/activity';
 
@@ -43,19 +44,54 @@ class ProjectController extends Response {
 
   async createProject(req, res) {
     const dbHandler = new ProjectHandler();
+    const activity = new ActivityFeedHandler();
 
-    let data, statusCode;
+    let data, statusCode, pipe, project;
 
     try {
-      data = await dbHandler.create(req.body);
+      project = await dbHandler.create({nonprofitId: req.body.sanitized._id, item: req.body.sanitized.item});
+
+      pipe = await activity.addActivity({
+        actor: project.nonprofitId,
+        verb: 'created',
+        object: project._id,
+      });
+
+      data = jwt.generate({...req.body.sanitized.user});
+      data._id = project._id;
+
       statusCode = this.statusCode['success'];
-    } catch(e) {
-      data = await dbHandler.create(req.body);
+
+    } catch(err) {
+      console.log(err);
+      data = { msg: 'Something went wrong' };
       statusCode = this.statusCode['not found'];
     }
 
     return new Response(data, statusCode);
   }
+
+  async updateProject(req, res) {
+    const dbHandler = new ProjectHandler();
+    const activity = new ActivityFeedHandler();
+
+    let data, statusCode, pipe, project;
+
+    try {
+      project = await dbHandler.updateById(req.params.id, {...req.body.project});
+
+      data = jwt.generate({...req.body.sanitized.user});
+
+      statusCode = this.statusCode['success'];
+    } catch(err) {
+      console.log(err);
+      data = { msg: 'Something went wrong' };
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
+
 
   async bookmark(req, res) {
     const dbHandler = new ProjectHandler();

@@ -19,6 +19,14 @@ router.route('/')
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
+router.route('/update/:id')
+
+    .put( async (req, res) => {
+      const response = await controller.updateProject(req, res);
+
+      res.status(response.getStatusCode()).json(response.getJSONData());
+    });
+
 router.route('/:id')
 
   .get( async (req, res) => {
