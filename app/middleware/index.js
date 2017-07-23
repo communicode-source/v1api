@@ -9,7 +9,13 @@ import sanatizer from './sanatizer';
 import {sourced} from './sourced';
 import tokenMiddleware from './jwt';
 
+import sanitize from 'sanitizer';
+
 module.exports = (app) => {
+
+  String.prototype.sanitize = function() {
+      return sanitize.escape(this.toString());
+  }
 
   app.set('port', process.env.PORT || 3000);
   app.set('json spaces', 3);
