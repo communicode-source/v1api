@@ -121,10 +121,10 @@ class UserController extends Response {
 
       try {
           // Find # of users to tell how to construct the profile url
-          numberOfSimilarUsers = await dbHandler.findAllUsersWithFirstAndLast(fname, lname);
+          // numberOfSimilarUsers = await dbHandler.findAllUsersWithFirstAndLast(fname, lname);
 
-          profileURL = this.createProfileURL(numberOfSimilarUsers, fname, lname, organizationname, req.body.user.profile._id);
-
+          // profileURL = this.createProfileURL(numberOfSimilarUsers, fname, lname, organizationname, req.body.user.profile._id);
+          profileURL = req.userToken._id;
           modified = await dbHandler.updateUser(req.body.user.profile._id, { fname: fname, lname: lname, organizationname: organizationname, url: profileURL });
 
           data = {
@@ -220,9 +220,6 @@ class UserController extends Response {
                 continue;
             }
             fields[i] = fields[i].sanitize();
-        }
-        if(fields.password || fields._id) {
-            throw new Error('Cannot change password or id');
         }
         delete fields.password;
         delete fields._id;
