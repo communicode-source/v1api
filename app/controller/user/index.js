@@ -205,6 +205,35 @@ class UserController extends Response {
 
         return organizationname.replace(/\s/g, '').toLowerCase();
     }
+
+    async updateUser(req, res) {
+        const userID = req.userToken._id;
+        const dbHandler = new UserHandler();
+        const fields = {...req.body.settings};
+        let data;
+        for(const i in fields) {
+            if(fields[i] === null || fields[i] === null || fields[i] === undefined) {
+              delete fields[i];
+              continue;
+            }
+            if(typeof fields[i] !== 'String' || typeof fields[i] !== 'string') {
+                continue;
+            }
+            fields[i] = fields[i].sanitize();
+        }
+        delete fields.password;
+        if(fields.city && fields.country) {
+            fields.location = [fields.city, fields.country];
+        }
+        try {
+            const u = await dbHandler.updateUser(userID, fields);
+            data = jwt.generate(LoginDataPull(await dbHandler.find({_id: userID})));
+        }
+        catch(e) {
+            data = {err: true, msg: JSON.stringify(e)};
+        }
+        return new Response(data, 200);
+    }
 }
 
 export let controller = new UserController()

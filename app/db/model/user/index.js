@@ -15,8 +15,9 @@ let User = mongoose.Schema({
   providerid       : {type: String,  default:     null},
   skills           : {type: Array,   default:     null},
   biography        : {type: String,  default:     null},
-  location         : {type: String,  default:     null},
-  social           : {type: Object,  default:     null},
+  education        : {type: String,  default:     null},
+  location         : {type: Array,   default:     null},
+  socials          : {type: Object,  default:     null},
   job              : {type: String,  default:     null},
   url              : {type: String,  default:     null}
 });

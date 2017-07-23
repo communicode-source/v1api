@@ -6,9 +6,9 @@ import { requireLogin } from './../../middleware/auth';
 
 const router = express.Router();
 
-router.route('/update/:id')
+router.route('/update')
 
-  .get( requireLogin, async (req, res) => {
+  .put( requireLogin, async (req, res) => {
     const response = await controller.updateUser(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());

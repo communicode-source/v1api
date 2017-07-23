@@ -13,7 +13,12 @@ export let LoginDataPull = user => {
     skills: user.skills,
     nonprofittype: user.nonprofittype,
     accountType: user.accountType,
-    organizationname: user.organizationname
+    organizationname: user.organizationname,
+    biography: user.biography,
+    location: user.location,
+    job: user.job,
+    education: user.education,
+    socials: user.socials
   }
 }
 
