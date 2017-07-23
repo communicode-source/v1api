@@ -85,6 +85,10 @@ class UserHandler {
     return User.update(query);
   }
 
+  updateById(id, user) {
+    return User.update({"_id": id}, { $set: user }).exec();
+  }
+
   /**
   *  This returns everything from the user db. Don't actually use this during production because we don't want to dump all users to random people.
   *  @return Promise, mongoose promise that returns the data from the db.

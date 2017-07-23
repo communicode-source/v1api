@@ -2,8 +2,17 @@ import express, { Router } from 'express';
 
 // Require the ProjectController
 import { controller } from './../../controller/user';
+import { requireLogin } from './../../middleware/auth';
 
 const router = express.Router();
+
+router.route(requireLogin, '/update/:id')
+
+  .get( async (req, res) => {
+    const response = await controller.updateUser(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+  });
 
 router.route('/profile/:url')
 
@@ -13,7 +22,7 @@ router.route('/profile/:url')
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
-router.route('/update/name/:id')
+router.route(requireLogin, '/update/name/:id')
 
   .put( async (req, res) => {
     const response = await controller.updateFirstAndLastName(req, res);
@@ -21,7 +30,7 @@ router.route('/update/name/:id')
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
-router.route('/update/interests/:id')
+router.route(requireLogin, '/update/interests/:id')
 
   .put( async (req, res) => {
     const response = await controller.updateInterests(req, res);
