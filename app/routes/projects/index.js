@@ -6,39 +6,39 @@ import { requireLogin } from './../../middleware/auth';
 
 const router = express.Router();
 
-router.route(requireLogin, '/')
+router.route('/')
 
-  .get( async (req, res) => {
+  .get( requireLogin, async (req, res) => {
     const response = await controller.index(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
   })
 
-  .post( async (req, res) => {
+  .post( requireLogin, async (req, res) => {
     const response = await controller.createProject(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
-router.route(requireLogin, '/update/:id')
+router.route('/update/:id')
 
-    .put( async (req, res) => {
+    .put( requireLogin, async (req, res) => {
       const response = await controller.updateProject(req, res);
 
       res.status(response.getStatusCode()).json(response.getJSONData());
     });
 
-router.route(requireLogin, '/:id')
+router.route('/:id')
 
-  .get( async (req, res) => {
+  .get( requireLogin, async (req, res) => {
     const response = await controller.findProject(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
-router.route(requireLogin, '/bookmark')
+router.route('/bookmark')
 
-  .post( async (req, res) => {
+  .post( requireLogin, async (req, res) => {
     const response = await controller.bookmark(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());

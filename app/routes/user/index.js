@@ -6,9 +6,9 @@ import { requireLogin } from './../../middleware/auth';
 
 const router = express.Router();
 
-router.route(requireLogin, '/update/:id')
+router.route('/update/:id')
 
-  .get( async (req, res) => {
+  .get( requireLogin, async (req, res) => {
     const response = await controller.updateUser(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
@@ -16,23 +16,23 @@ router.route(requireLogin, '/update/:id')
 
 router.route('/profile/:url')
 
-  .get( async (req, res) => {
+  .get(async (req, res) => {
     const response = await controller.getUserProfile(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
-router.route(requireLogin, '/update/name/:id')
+router.route('/update/name/:id')
 
-  .put( async (req, res) => {
+  .put( requireLogin, async (req, res) => {
     const response = await controller.updateFirstAndLastName(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
-router.route(requireLogin, '/update/interests/:id')
+router.route('/update/interests/:id')
 
-  .put( async (req, res) => {
+  .put( requireLogin, async (req, res) => {
     const response = await controller.updateInterests(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
