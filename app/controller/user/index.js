@@ -221,7 +221,11 @@ class UserController extends Response {
             }
             fields[i] = fields[i].sanitize();
         }
+        if(fields.password || fields._id) {
+            throw new Error('Cannot change password or id');
+        }
         delete fields.password;
+        delete fields._id;
         if(fields.city && fields.country) {
             fields.location = [fields.city, fields.country];
         }
