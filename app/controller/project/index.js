@@ -57,7 +57,6 @@ class ProjectController extends Response {
       data = {err: false, msg: await dbHandler.find({nonprofitId: id})};
       statusCode = this.statusCode['success'];
     } catch(err) {
-      data = {err: true, msg: JSON.stringify(err)};
       statusCode = this.statusCode['not found'];
     }
 
@@ -150,7 +149,7 @@ class ProjectController extends Response {
         });
 
         const charge = await stripe.charges.create({
-            amount: (+req.body.price * 100),
+            amount: Math.floor((+req.body.price * 100)),
             currency: "USD",
             customer: customer.id
         });
@@ -173,7 +172,7 @@ class ProjectController extends Response {
 
       } else {
         const charge = await stripe.charges.create({
-            amount: (+req.body.price * 100),
+            amount: Math.floor((+req.body.price * 100)),
             currency: "USD",
             customer: customerInfo.customer.customerId
         });
