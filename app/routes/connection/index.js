@@ -28,5 +28,12 @@ router.route('/following/:id')
 
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
+router.route('/stats/:id')
+
+  .get( async(req, res) => {
+    const response = await controller.getNumberOfStats(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+  });
 
 export default router;

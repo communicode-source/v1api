@@ -45,4 +45,8 @@ export default class ConnectionHandler {
   calculateNewAffinity(currAffinity, newAffinity) {
     return currAffinity + (currAffinity*newAffinity);
   }
+
+  find(query) {
+      return Connection.find(query).exec();
+  }
 }

@@ -51,6 +51,27 @@ class ConnectionController extends Response {
 
     return new Response(data, statusCode);
   }
+
+  async getNumberOfStats(req, res) {
+    const dbHandler = new ConnectionHandler();
+
+    let data, statusCode;
+
+    try {
+      const following = dbHandler.find({actor: req.params.id});
+      const followers = dbHandler.find({object: req.params.id});
+      data = {err: false, msg: {
+          following: (await following).length - 1,
+          followers: (await followers).length - 1
+      }};
+      statusCode = this.statusCode['success'];
+    } catch(e) {
+      data = await dbHandler.create();
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
 }
 
 export default new ConnectionController();
