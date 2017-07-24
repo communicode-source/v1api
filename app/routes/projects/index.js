@@ -28,6 +28,14 @@ router.route('/update/:id')
       res.status(response.getStatusCode()).json(response.getJSONData());
     });
 
+router.route('/charge')
+
+    .post( requireLogin, async (req, res) => {
+      const response = await controller.charge(req, res);
+
+      res.status(response.getStatusCode()).json(response.getJSONData());
+    });
+
 router.route('/:id')
 
   .get( requireLogin, async (req, res) => {

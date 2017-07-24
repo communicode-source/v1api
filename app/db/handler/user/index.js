@@ -133,6 +133,14 @@ class UserHandler {
     return User.findOne({'url': url}).exec();
   }
 
+  isUserCustomer(id) {
+    return User.findOne({'_id': id}, 'customer').exec();
+  }
+
+  updateUserIsCustomer(id, customerId) {
+    return User.update({"_id": id}, { $set: { customer: {isCustomer: true, customerId: customerId} } }).exec();
+  }
+
   /**
   *  This function resets the class for use with another user/query without have to do it manually or creating another handler instance.
   *  @param extent, true/false. Whether or not to clear this.user

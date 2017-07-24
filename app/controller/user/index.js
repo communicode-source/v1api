@@ -136,7 +136,7 @@ class UserController extends Response {
           };
 
           if(modified) {
-            data = jwt.generate(data);
+            data = jwt.generate(LoginDataPull(await dbHandler.find({_id: req.userToken._id})));
             statusCode = this.statusCode['success'];
           } else {
             throw new Error('Not modified');
@@ -165,7 +165,7 @@ class UserController extends Response {
         modified = await dbHandler.updateUser(req.params.id, { interests });
 
         if (modified) {
-          data = jwt.generate(data);
+          data = jwt.generate(LoginDataPull(await dbHandler.find({_id: req.userToken._id})));
           statusCode = this.statusCode['success'];
         } else {
           throw new Error('Could not update interests');

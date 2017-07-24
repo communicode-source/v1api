@@ -5,6 +5,11 @@ import Response from '../Response';
 import jwt from './../jwt'
 
 import ActivityFeedHandler from './../../db/handler/activity';
+import UserHandler from './../../db/handler/user';
+import {LoginDataPull} from './../../utils/validations'
+
+var stripe = require('stripe')('sk_test_v6YuHnfOi5QjZlIORYJDyUq6');
+stripe.setApiVersion('2017-06-05');
 
 class ProjectController extends Response {
 
@@ -111,7 +116,7 @@ class ProjectController extends Response {
     const dbHandler = new ProjectHandler();
     const activity = new ActivityFeedHandler();
 
-    let data, statusCode, pipe, project;
+    let data, statusCode, project;
 
     try {
       project = await dbHandler.updateById(req.params.id, {...req.body.project});
@@ -128,6 +133,72 @@ class ProjectController extends Response {
     return new Response(data, statusCode);
   }
 
+  async charge(req, res) {
+    const dbHandler = new ProjectHandler();
+    const user = new UserHandler();
+
+    let data, statusCode, project;
+
+    try {
+
+      const customerInfo = await user.isUserCustomer(req.body.id.sanitize());
+
+      if(!customerInfo.customer.isCustomer) {
+        const customer = await stripe.customers.create({
+          email: req.body.email,
+          source: req.body.stripeToken.id
+        });
+
+        const charge = await stripe.charges.create({
+            amount: (+req.body.price * 100),
+            currency: "USD",
+            customer: customer.id
+        });
+
+        if(charge.paid) {
+          data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
+
+          const newCustomer = await user.updateUserIsCustomer(req.body.id.sanitize(), customer.id);
+
+          if(newCustomer) {
+            statusCode = 200;
+          } else {
+            statusCode = 500;
+            throw new Error("Could not update User Customer account.");
+          }
+
+        } else {
+          throw new Error('Charge couldn\'t go through.');
+        }
+
+      } else {
+        const charge = await stripe.charges.create({
+            amount: (+req.body.price * 100),
+            currency: "USD",
+            customer: customerInfo.customer.customerId
+        });
+
+        if(charge.paid) {
+          data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
+          if(data) {
+            statusCode = 200;
+          } else {
+            statusCode = 500;
+            throw new Error("Could not update User Customer account.");
+          }
+        } else {
+          throw new Error('Charge couldn\'t go through.');
+        }
+      }
+
+    } catch(err) {
+      console.log(err);
+      data = { msg: 'Something went wrong'};
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
 
   async bookmark(req, res) {
     const dbHandler = new ProjectHandler();

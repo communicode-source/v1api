@@ -19,7 +19,8 @@ let User = mongoose.Schema({
   location         : {type: Array,   default:     null},
   socials          : {type: Object,  default:     null},
   job              : {type: String,  default:     null},
-  url              : {type: String,  default:     null}
+  url              : {type: String,  default:     null},
+  customer         : {type: Object, default:     {isCustomer: false, customerId: null}}
 });
 
 User.methods.generateHash = function(password) {
