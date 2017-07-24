@@ -79,7 +79,7 @@ class ProjectController extends Response {
         object: project._id,
       });
 
-      data = jwt.generate({...req.body.sanitized.user});
+      data = jwt.generate(req.userToken);
       data._id = project._id;
 
       statusCode = this.statusCode['success'];
@@ -97,6 +97,7 @@ class ProjectController extends Response {
       const dbHandler = new ProjectHandler();
       let data, statusCode = 200;
       try {
+          console.log(req.userToken);
           let proj = await dbHandler.find({_id: req.body.id, nonprofitId: req.userToken._id, isCompleted: false});
           if(proj.length !== 1) {
               throw new Error('Invalid number of projects');
@@ -121,7 +122,7 @@ class ProjectController extends Response {
     try {
       project = await dbHandler.updateById(req.params.id, {...req.body.project});
 
-      data = jwt.generate({...req.body.sanitized.user});
+      data = jwt.generate(req.userToken);
 
       statusCode = this.statusCode['success'];
     } catch(err) {
