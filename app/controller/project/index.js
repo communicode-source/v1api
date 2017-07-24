@@ -42,6 +42,23 @@ class ProjectController extends Response {
     return new Response(data, statusCode);
   }
 
+  async findProjectByNP(req, res) {
+    const dbHandler = new ProjectHandler();
+    const id = req.params.id;
+
+    let data, statusCode;
+
+    try {
+      data = {err: false, msg: await dbHandler.find({nonprofitId: id})};
+      statusCode = this.statusCode['success'];
+    } catch(err) {
+      data = {err: true, msg: JSON.stringify(err)};
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
+
   async createProject(req, res) {
     const dbHandler = new ProjectHandler();
     const activity = new ActivityFeedHandler();
@@ -69,6 +86,25 @@ class ProjectController extends Response {
     }
 
     return new Response(data, statusCode);
+  }
+
+  async complete(req, res) {
+      const dbHandler = new ProjectHandler();
+      let data, statusCode = 200;
+      try {
+          let proj = await dbHandler.find({_id: req.body.id, nonprofitId: req.userToken._id, isCompleted: false});
+          if(proj.length !== 1) {
+              throw new Error('Invalid number of projects');
+          }
+          proj = proj[0];
+          proj.isCompleted = true;
+          await proj.save();
+          data = {err: false, msg: 'Completed'};
+      } catch(e) {
+          console.log(e);
+          data = {err: true, msg: 'Error error'};
+      }
+      return new Response(data, statusCode);
   }
 
   async updateProject(req, res) {

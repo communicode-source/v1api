@@ -36,6 +36,20 @@ router.route('/:id')
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
+router.route('/find/:id')
+  .get( async (req, res) => {
+    const response = await controller.findProjectByNP(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+});
+
+router.route('/complete')
+  .put( requireLogin, async (req, res) => {
+    const response = await controller.complete(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+});
+
 router.route('/bookmark')
 
   .post( requireLogin, async (req, res) => {

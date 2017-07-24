@@ -227,10 +227,17 @@ class UserController extends Response {
             fields.location = [fields.city, fields.country];
         }
         try {
+            if(fields.url && fields.url !== req.userToken.url) {
+                const check = await dbHandler.addQuery({url: fields.url}).readUsers();
+                if(check.length !== 0) {
+                    throw new Error('Already taken');
+                }
+            }
             const u = await dbHandler.updateUser(userID, fields);
             data = jwt.generate(LoginDataPull(await dbHandler.find({_id: userID})));
         }
         catch(e) {
+            console.log(e);
             data = {err: true, msg: JSON.stringify(e)};
         }
         return new Response(data, 200);
