@@ -96,7 +96,6 @@ class ProjectController extends Response {
       const dbHandler = new ProjectHandler();
       let data, statusCode = 200;
       try {
-          console.log(req.userToken);
           let proj = await dbHandler.find({_id: req.body.id, nonprofitId: req.userToken._id, isCompleted: false});
           if(proj.length !== 1) {
               throw new Error('Invalid number of projects');
@@ -131,6 +130,26 @@ class ProjectController extends Response {
     }
 
     return new Response(data, statusCode);
+  }
+
+  async deleteNonProfitFromProject(req, res) {
+      const dbHandler = new ProjectHandler();
+      let data, statusCode = 200;
+      try {
+          let proj = await dbHandler.find({_id: req.body.id, nonprofitId: req.userToken._id, isActive: false});
+          if(proj.length !== 1) {
+              throw new Error('Invalid number of projects');
+          }
+          proj = proj[0];
+          proj.isActive = false;
+          proj.nonprofitId = null;
+          await proj.remove();
+          data = {err: false, msg: 'Completed'};
+      } catch(e) {
+          console.log(e);
+          data = {err: true, msg: 'Error error'};
+      }
+      return new Response(data, statusCode);
   }
 
   async charge(req, res) {

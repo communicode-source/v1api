@@ -58,6 +58,13 @@ router.route('/complete')
     res.status(response.getStatusCode()).json(response.getJSONData());
 });
 
+router.route('/deleteNP')
+  .put( requireLogin, async (req, res) => {
+    const response = await controller.deleteNonProfitFromProject(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+});
+
 router.route('/bookmark')
 
   .post( requireLogin, async (req, res) => {
