@@ -296,6 +296,10 @@ class ProjectController extends Response {
       }
       await matchHandle.add({developerId: req.userToken._id, nonprofitId: project[0].nonprofitId, projectId: project[0]._id});
       project[0].matched = true;
+      project[0].potential = {
+          id: req.userToken._id,
+          url: req.userToken.url
+      };
       project[0].save();
       data = {err: false, msg: 'Success'};
     }
