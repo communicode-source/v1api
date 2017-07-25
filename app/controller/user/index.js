@@ -73,6 +73,7 @@ class UserController extends Response {
       const dbHandler = new UserHandler()
       const activity = new ActivityFeedHandler()
       const isLocal = (req.body.sanitized.provider === 'local')
+      console.log(req.body.sanitized);
       // Declarations of  variables
       let status, data, newUser, pipe
 
@@ -82,10 +83,11 @@ class UserController extends Response {
         newUser = (isLocal) ? createLocalUser(contents, dbHandler) : await createExternalUser(contents)
         // Checks to ensure the new user is in fact unique.
         const unique = await uniqueUser(newUser, dbHandler)
-
         // Creating the new user in the DB and returning it.
+        newUser.accountType = (+newUser.accountType === 1);
         newUser = await dbHandler.createUser(newUser)
-
+        newUser.url = newUser._id;
+        newUser.save();
         // Create the status code and the user JWT as data.
         status = this.statusCode['success']
         data = jwt.generate(LoginDataPull(newUser))
@@ -304,8 +306,9 @@ class UserController extends Response {
       avatar.mv('uploads/' + uuid + "." + ext, (err) => {
         bucket.upload('uploads/' + uuid + "." + ext, function(err, file) {
           if (!err) {
+            console.log('Successfully uploaded file');
             fs.unlinkSync('uploads/' + uuid + "." + ext);
-            res.json(data);
+            res.status(200).json(data);
           } else {
             console.log(err);
             res.send(500).end();

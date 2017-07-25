@@ -23,10 +23,11 @@ export default (accessToken, AT, email, name, id) => {
         const user = {
           providerid: id,
           provider: 'facebook',
-          fname: payName[0],
-          lname: payName[payName.length-1],
+          fname: (+AT === 0) ? payName[0] : null,
+          lname: (+AT === 0) ? payName[payName.length-1] : null,
+          organizationname:  (+AT === 1) ? name : null,
           email: email,
-          accounttype: AT
+          accountType: +AT
         }
           response(user);
       });

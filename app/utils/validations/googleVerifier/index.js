@@ -19,10 +19,11 @@ export default (accessToken, AT) => {
       const user = {
         providerid: payload['sub'],
         provider: 'google',
-        fname: payload['given_name'],
-        lname: payload['family_name'],
+        fname: (+AT === 0) ? payload['given_name'] : null,
+        lname: (+AT === 0) ? payload['family_name'] : null,
+        organizationname: (+AT === 1) ? (payload['given_name'] + ' ' + payload['family_name']) : null,
         email: payload['email'],
-        accounttype: AT
+        accountType: +AT
       }
       return response(user);
     })

@@ -52,8 +52,9 @@ router.route('/cover/upload')
 
   .post(requireLogin, async(req, res) => {
       const response = await controller.uploadCover(req, res);
-
-      res.status(response.getStatusCode()).json(response.getJSONData());
+      if(response) {
+          res.status(response.getStatusCode()).json(response.getJSONData());
+      }
   });
 
 export default router;
