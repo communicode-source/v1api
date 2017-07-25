@@ -10,7 +10,7 @@ class ProjectHandler {
    * Returns all projects from the projects collection
   **/
   findAll() {
-    return Project.find({}).exec();
+    return Project.find({}).populate('nonprofitId').exec();
   }
 
   /**
