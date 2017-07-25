@@ -190,7 +190,7 @@ class ProjectController extends Response {
         });
         if(charge.paid) {
           data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
-
+          const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false });
           const newCustomer = await user.updateUserIsCustomer(req.body.id.sanitize(), customer.id);
           await chargeHandle.add({cost: Math.floor((+req.body.price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customer.id, projectId: req.body.projectId});
           if(newCustomer) {
@@ -212,6 +212,7 @@ class ProjectController extends Response {
         });
         await chargeHandle.add({cost: Math.floor((+req.body.price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customerInfo.customer.customerId, projectId: req.body.projectId});
         if(charge.paid) {
+          const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false });
           data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
           if(data) {
             statusCode = 200;
@@ -305,6 +306,51 @@ class ProjectController extends Response {
     }
     return new Response(data, statusCode);
   }
+
+  async deposit(req, res) {
+    const dbHandler = new ProjectHandler();
+    const user = new UserHandler();
+    let data, statusCode;
+
+    try {
+      const token_id = request.body.stripeToken; // Using Express
+      const developer = await user.find({_id: req.body.id.sanitize()});
+      const project = await user.findById(req.body.projectId.sanitize());
+
+      // Create a Recipient
+      const recipient = await stripe.recipients.create({
+        name: developer.fname + " " + developer.lname,
+        type: "individual",
+        card: token_id,
+        email: developer.email
+      });
+
+      if(recipient.id) {
+        const payout = await stripe.payouts.create({
+          amount: (+req.body.price * 100), // amount in cents
+          currency: "usd",
+          recipient: recipient.id,
+          card: recipient.cardId,
+          statement_descriptor: "Communicode Project: " + project.title
+        });
+        if(!payout) {
+          throw new Error('Could not create payout');
+        }
+
+        data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
+
+      } else {
+        throw new Error('Could not create recipient');
+      }
+
+    } catch(e) {
+      console.log(e);
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
+
 
 }
 
