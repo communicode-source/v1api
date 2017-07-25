@@ -17,13 +17,14 @@ class ProjectController extends Response {
     const dbHandler = new ProjectHandler();
     const activity = new ActivityFeedHandler();
 
-    let data, statusCode, pipe;
+    let data, statusCode;
 
     try {
       data = await dbHandler.findAll();
+      data.msg = jwt.generate(req.userToken);
       statusCode = this.statusCode['success'];
     } catch(err) {
-      data = await dbHandler.findAll();
+      console.log(err);
       statusCode = this.statusCode['not found'];
     }
 

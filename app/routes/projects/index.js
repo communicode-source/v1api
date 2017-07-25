@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.route('/')
 
-  .get( requireLogin, async (req, res) => {
+  .get( async (req, res) => {
     const response = await controller.index(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
@@ -19,6 +19,15 @@ router.route('/')
 
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
+
+router.route('/all')
+
+  .post( requireLogin, async (req, res) => {
+    const response = await controller.index(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+  });
+
 
 router.route('/update/:id')
 
