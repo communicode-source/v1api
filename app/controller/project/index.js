@@ -285,10 +285,14 @@ class ProjectController extends Response {
           throw new Error('incorrect user type');
       }
       const project = await dbHandler.find({_id: req.body.id, isActive: true, isDraft: false, matched: false});
-      const alMatched = await matchHandle.find({projectId: project[0]._id});
-      if(project.length !== 1 || alMatched.length !== 0) {
-          console.log(projects.length, alMatched.length);
+      if(project.length !== 1) {
+          console.log(project.length);
           throw new Error('incorrect number of projects');
+      }
+      const alMatched = await matchHandle.find({projectId: project[0]._id});
+      if(alMatched.length !== 0) {
+          console.log(alMatched.length);
+          throw new Error('incorrect number of matches');
       }
       await matchHandle.add({developerId: req.userToken._id, nonprofitId: project[0].nonprofitId, projectId: project[0]._id});
       project[0].matched = true;
@@ -296,6 +300,7 @@ class ProjectController extends Response {
       data = {err: false, msg: 'Success'};
     }
     catch(e) {
+        console.log(e);
         data = {err: true, msg: e.message};
     }
     return new Response(data, statusCode);
