@@ -242,6 +242,10 @@ class UserController extends Response {
         }
         return new Response(data, 200);
     }
+
+    uploadAvatar(req, res) {
+      console.log(req.body);
+    }
 }
 
 export let controller = new UserController()

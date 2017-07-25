@@ -38,5 +38,13 @@ router.route('/update/interests/:id')
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
+router.route('/avatar/upload')
+
+  .post(async(req, res) => {
+      const response = await controller.uploadAvatar(req, res);
+
+      res.status(response.getStatusCode()).json(response.getJSONData());
+  });
+
 
 export default router;
