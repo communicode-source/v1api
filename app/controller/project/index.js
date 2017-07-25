@@ -6,6 +6,8 @@ import jwt from './../jwt'
 
 import ActivityFeedHandler from './../../db/handler/activity';
 import UserHandler from './../../db/handler/user';
+import ChargeHandler from './../../db/handler/charge';
+import MatchHandler from './../../db/handler/match';
 import {LoginDataPull} from './../../utils/validations'
 
 var stripe = require('stripe')('sk_test_v6YuHnfOi5QjZlIORYJDyUq6');
@@ -71,6 +73,9 @@ class ProjectController extends Response {
     let data, statusCode, pipe, project;
 
     try {
+      if(req.userToken.accountType !== true) {
+          throw new Error('incorrect user type');
+      }
       project = await dbHandler.create({nonprofitId: req.body.sanitized._id, item: req.body.sanitized.item});
 
       pipe = await activity.addActivity({
@@ -119,6 +124,9 @@ class ProjectController extends Response {
     let data, statusCode, project;
 
     try {
+      if(req.userToken.accountType !== true) {
+          throw new Error('incorrect user type');
+      }
       project = await dbHandler.updateById(req.params.id, {...req.body.project});
 
       data = jwt.generate(req.userToken);
@@ -135,12 +143,18 @@ class ProjectController extends Response {
 
   async deleteNonProfitFromProject(req, res) {
       const dbHandler = new ProjectHandler();
+      const chargeHandle = new ChargeHandler();
       let data, statusCode = 200;
       try {
           let proj = await dbHandler.find({_id: req.body.id, nonprofitId: req.userToken._id, isActive: false});
-          if(proj.length !== 1) {
+          let charge = await chargeHandle.find({nonprofitId: req.userToken._id, projectId: req.body.id});
+          if(proj.length !== 1 || charge.length !== 1) {
               throw new Error('Invalid number of projects');
           }
+          await stripe.refunds.create({
+              charge: charge[0].chargeId,
+              amount: Math.ceil(+charge[0].cost * .901)
+          })
           proj = proj[0];
           proj.isActive = false;
           proj.nonprofitId = null;
@@ -156,7 +170,7 @@ class ProjectController extends Response {
   async charge(req, res) {
     const dbHandler = new ProjectHandler();
     const user = new UserHandler();
-
+    const chargeHandle = new ChargeHandler();
     let data, statusCode, project;
 
     try {
@@ -174,12 +188,11 @@ class ProjectController extends Response {
             currency: "USD",
             customer: customer.id
         });
-
         if(charge.paid) {
           data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
 
           const newCustomer = await user.updateUserIsCustomer(req.body.id.sanitize(), customer.id);
-
+          await chargeHandle.add({cost: Math.floor((+req.body.price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customer.id, projectId: req.body.projectId});
           if(newCustomer) {
             statusCode = 200;
           } else {
@@ -197,7 +210,7 @@ class ProjectController extends Response {
             currency: "USD",
             customer: customerInfo.customer.customerId
         });
-
+        await chargeHandle.add({cost: Math.floor((+req.body.price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customerInfo.customer.customerId, projectId: req.body.projectId});
         if(charge.paid) {
           data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
           if(data) {
@@ -258,6 +271,33 @@ class ProjectController extends Response {
       statusCode = this.statusCode['not found'];
     }
 
+    return new Response(data, statusCode);
+  }
+
+  // req.body.id = id of project,
+  // user must be signed in and a developerId
+  async matchDev(req, res) {
+    const dbHandler = new ProjectHandler();
+    const matchHandle = new MatchHandler();
+    let data, statusCode = 200;
+    try {
+      if(req.userToken.accountType !== false) {
+          throw new Error('incorrect user type');
+      }
+      const project = await dbHandler.find({_id: req.body.id, isActive: true, isDraft: false, matched: false});
+      const alMatched = await matchHandle.find({projectId: project[0]._id});
+      if(project.length !== 1 || alMatched.length !== 0) {
+          console.log(projects.length, alMatched.length);
+          throw new Error('incorrect number of projects');
+      }
+      await matchHandle.add({developerId: req.userToken._id, nonprofitId: project[0].nonprofitId, projectId: project[0]._id});
+      project[0].matched = true;
+      project[0].save();
+      data = {err: false, msg: 'Success'};
+    }
+    catch(e) {
+        data = {err: true, msg: e.message};
+    }
     return new Response(data, statusCode);
   }
 

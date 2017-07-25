@@ -14,10 +14,11 @@ class ChargesHandler {
         return Charge.find(query).exec();
     }
     add(record) {
-        const {chargeId, nonprofitId, nonprofitStripeAccount, projectId} = record;
-        if(!chargeId || !nonprofitId || !nonprofitStripeAccount || !projectId) {
+        const {cost, chargeId, nonprofitId, nonprofitStripeAccount, projectId} = record;
+        if(!cost || !chargeId || !nonprofitId || !nonprofitStripeAccount || !projectId) {
             throw new Error('Required fields missing');
         }
+        return new Charge(record).save();
     }
 }
 

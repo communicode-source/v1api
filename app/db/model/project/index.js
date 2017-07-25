@@ -14,6 +14,7 @@ var Project = mongoose.Schema({
   endTime: String,
   developerCost: Number,
   totalCost: Number,
+  matched: {type: Boolean, default: false},
   isDraft: { type: Boolean, default: true },
   isActive: { type: Boolean, default: false },
   isCompleted: { type: Boolean, default: false },
