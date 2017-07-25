@@ -279,6 +279,40 @@ class UserController extends Response {
         });
       });
     }
+
+    async uploadCover(req, res) {
+      const dbHandler = new UserHandler();
+      const gcs = storage({
+        projectId: 'communicode-167922',
+        keyFilename: 'app/config/communicode-cb711c407a01.json'
+      });
+      const bucket = gcs.bucket('user-profile-cover');
+
+      let avatar = req.files.cover;
+      let ext = req.files.cover.name.split('.').pop();
+      let data;
+
+      const uuid = uuidV4();
+      try {
+          const user = await dbHandler.updateById(req.body.id, { image: { cover: uuid + "." + ext } });
+          data = jwt.generate(LoginDataPull(await dbHandler.find({_id: req.body.id})));
+      } catch(e) {
+          console.log(e);
+          res.send(500).end();
+      }
+
+      avatar.mv('uploads/' + uuid + "." + ext, (err) => {
+        bucket.upload('uploads/' + uuid + "." + ext, function(err, file) {
+          if (!err) {
+            fs.unlinkSync('uploads/' + uuid + "." + ext);
+            res.json(data);
+          } else {
+            console.log(err);
+            res.send(500).end();
+          }
+        });
+      });
+    }
 }
 
 export let controller = new UserController()
