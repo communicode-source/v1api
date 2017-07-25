@@ -2,12 +2,13 @@ import express, { Router } from 'express';
 
 // Require the ConnectionController
 import controller from './../../controller/connection';
+import { requireLogin } from './../../middleware/auth';
 
 const router = express.Router();
 
 router.route('/create')
 
-  .post( async(req, res) => {
+  .post( requireLogin, async(req, res) => {
     const response = await controller.createConnection(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
@@ -30,7 +31,7 @@ router.route('/following/:id')
   });
 router.route('/stats/:id')
 
-  .get( async(req, res) => {
+  .post( async(req, res) => {
     const response = await controller.getNumberOfStats(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());

@@ -13,7 +13,7 @@ export default class ConnectionHandler {
     return Connection.find({'actor': id, 'isFollowing': isFollowing}).exec();
   }
 
-  async create(actor, object, affinity, isFollowing) {
+  async create(actor, object, affinity) {
 
     let shouldUpdate;
 
@@ -25,6 +25,7 @@ export default class ConnectionHandler {
 
     if(shouldUpdate) {
       const connection = shouldUpdate;
+      console.log(connection);
       const newAffinity = this.calculateNewAffinity(connection.affinity, affinity);
       connection.affinity = newAffinity;
       return connection.save();
@@ -33,8 +34,7 @@ export default class ConnectionHandler {
     return new Connection({
       actor: actor,
       object: object,
-      affinity: affinity,
-      isFollowing: isFollowing
+      affinity: 0.45
     }).save();
   }
 
