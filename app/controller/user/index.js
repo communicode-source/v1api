@@ -260,7 +260,7 @@ class UserController extends Response {
 
       const uuid = uuidV4();
       try {
-          const user = await dbHandler.updateById(req.body.id, { image: { avatar: uuid + "." + ext } });
+          const user = await dbHandler.updateById(req.body.id, {  'image.avatar': uuid + "." + ext   });
           data = jwt.generate(LoginDataPull(await dbHandler.find({_id: req.body.id})));
       } catch(e) {
           console.log(e);
@@ -294,7 +294,7 @@ class UserController extends Response {
 
       const uuid = uuidV4();
       try {
-          const user = await dbHandler.updateById(req.body.id, { image: { cover: uuid + "." + ext } });
+          const user = await dbHandler.updateById(req.body.id, { 'image.cover': uuid + "." + ext  });
           data = jwt.generate(LoginDataPull(await dbHandler.find({_id: req.body.id})));
       } catch(e) {
           console.log(e);
