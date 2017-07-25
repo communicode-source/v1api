@@ -16,6 +16,9 @@ import {LoginDataPull, verifyExternalLoginUser, isLocalUser, createLocalUser, cr
 import ActivityFeedHandler from './../../db/handler/activity';
 import mongoose from 'mongoose';
 
+import uuidV4 from 'uuid/v4';
+import storage from '@google-cloud/storage';
+import fs from 'fs';
 
 class UserController extends Response {
 
@@ -243,8 +246,38 @@ class UserController extends Response {
         return new Response(data, 200);
     }
 
-    uploadAvatar(req, res) {
-      console.log(req.body);
+    async uploadAvatar(req, res) {
+      const dbHandler = new UserHandler();
+      const gcs = storage({
+        projectId: 'communicode-167922',
+        keyFilename: 'app/config/communicode-cb711c407a01.json'
+      });
+      const bucket = gcs.bucket('user-profile-avatars');
+
+      let avatar = req.files.avatar;
+      let ext = req.files.avatar.name.split('.').pop();
+      let data;
+
+      const uuid = uuidV4();
+      try {
+          const user = await dbHandler.updateById(req.body.id, { image: { avatar: uuid + "." + ext } });
+          data = jwt.generate(LoginDataPull(await dbHandler.find({_id: req.body.id})));
+      } catch(e) {
+          console.log(e);
+          res.send(500).end();
+      }
+
+      avatar.mv('uploads/' + uuid + "." + ext, (err) => {
+        bucket.upload('uploads/' + uuid + "." + ext, function(err, file) {
+          if (!err) {
+            fs.unlinkSync('uploads/' + uuid + "." + ext);
+            res.json(data);
+          } else {
+            console.log(err);
+            res.send(500).end();
+          }
+        });
+      });
     }
 }
 

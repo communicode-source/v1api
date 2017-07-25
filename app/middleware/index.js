@@ -9,6 +9,7 @@ import sanatizer from './sanatizer';
 import {sourced} from './sourced';
 import tokenMiddleware from './jwt';
 
+import fileUpload from 'express-fileupload';
 import sanitize from 'sanitizer';
 
 module.exports = (app) => {
@@ -20,9 +21,9 @@ module.exports = (app) => {
   app.set('port', process.env.PORT || 3000);
   app.set('json spaces', 3);
 
+  app.use(fileUpload());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
-
 
   app.use('/', tokenMiddleware);
 

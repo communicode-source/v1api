@@ -20,7 +20,8 @@ let User = mongoose.Schema({
   socials          : {type: Object,  default:     null},
   job              : {type: String,  default:     null},
   url              : {type: String,  default:     null},
-  customer         : {type: Object, default:     {isCustomer: false, customerId: null}}
+  customer         : {type: Object, default:     {isCustomer: false, customerId: null}},
+  image            : {type: Object, default:     {avatar: '', cover: ''}}
 });
 
 User.methods.generateHash = function(password) {

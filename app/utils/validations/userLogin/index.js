@@ -18,7 +18,8 @@ export let LoginDataPull = user => {
     location: user.location,
     job: user.job,
     education: user.education,
-    socials: user.socials
+    socials: user.socials,
+    image: user.image
   }
 }
 

@@ -1,4 +1,5 @@
 import express, { Router } from 'express';
+import multer from 'multer';
 
 // Require the ProjectController
 import { controller } from './../../controller/user';
@@ -38,9 +39,10 @@ router.route('/update/interests/:id')
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
+
 router.route('/avatar/upload')
 
-  .post(async(req, res) => {
+  .post(requireLogin, async(req, res) => {
       const response = await controller.uploadAvatar(req, res);
 
       res.status(response.getStatusCode()).json(response.getJSONData());
