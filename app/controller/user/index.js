@@ -73,12 +73,19 @@ class UserController extends Response {
       const dbHandler = new UserHandler()
       const activity = new ActivityFeedHandler()
       const isLocal = (req.body.sanitized.provider === 'local')
-      console.log(req.body.sanitized);
+
       // Declarations of  variables
       let status, data, newUser, pipe
 
-
       try {
+        if(isLocal) {
+            if(contents.password.isPassword() === false) {
+                throw new Error('Invalid pw');
+            }
+            if(contents.email.isEmail() === false) {
+                throw new Error('Invalid email');
+            }
+        }
         // Getting the user Json from the req.
         newUser = (isLocal) ? createLocalUser(contents, dbHandler) : await createExternalUser(contents)
         // Checks to ensure the new user is in fact unique.
@@ -108,11 +115,18 @@ class UserController extends Response {
         }).dispatch(['createConnection', 'addToFeed']);
 
       } catch(e) {
-        console.log(e)
+        console.log(e);
         status = this.statusCode['success']
-        data = 100
+        if(e.message === 'Invalid pw') {
+          data = 103;
+        }
+        else if(e.message === 'Invalid email') {
+          data = 105;
+        }
+        else {
+          data = 100;
+        }
       }
-
       return new Response(data, status)
     }
 

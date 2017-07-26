@@ -18,6 +18,18 @@ module.exports = (app) => {
       return sanitize.escape(this.toString());
   }
 
+  String.prototype.isPassword = function() {
+      return (this.length >= 6);
+  }
+
+  String.prototype.isEmail = function() {
+      const reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if(reg.test(this.toString())) {
+          return true;
+      }
+      return false;
+  }
+
   app.set('port', process.env.PORT || 3000);
   app.set('json spaces', 3);
 

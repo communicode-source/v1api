@@ -31,12 +31,11 @@ router.route('/login')
 
 router.route('/create')
   .post(async (req, res) => {
-    const response = await controller.createUser(req, res);
     try{
+      const response = await controller.createUser(req, res);
       res.status(response.getStatusCode()).json(response.getJSONData());
     } catch(e) {
       console.log(e);
-      console.log(response);
       res.status(500).json({err: true, msg: 'Something went wrong'});
     }
   })

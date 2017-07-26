@@ -94,6 +94,9 @@ class Recover extends Response {
                 throw new Error(612);
             }
             user = user[0];
+            if(req.body.sanitized.password.isPassword() === false) {
+                throw new Error(615);
+            }
             user.password = dbUserHandler.makePassword(req.body.sanitized.password);
             user.save();
             data = {
@@ -104,7 +107,7 @@ class Recover extends Response {
             recoveryData.save();
         } catch(e) {
             console.log(e);
-            data = (['610', '611', '612'].indexOf(e.message) !== -1) ? e.message : {err: true, msg: 'There was an error'};
+            data = (['610', '611', '612', '615'].indexOf(e.message) !== -1) ? e.message : {err: true, msg: 'There was an error'};
         }
 
         return new Response(data, 200);
