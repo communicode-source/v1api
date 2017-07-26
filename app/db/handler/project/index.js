@@ -22,6 +22,10 @@ class ProjectHandler {
     return Project.findById(id).exec();
   }
 
+  population(query, population) {
+      return Project.find(query).populate(population).exec();
+  }
+
   create(project) {
     return new Project({
       nonprofitId: project.nonprofitId,

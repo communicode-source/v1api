@@ -22,7 +22,7 @@ class ProjectController extends Response {
     let data, statusCode;
 
     try {
-      data = await dbHandler.findAll();
+      data = await dbHandler.population({}, {path: 'potential nonprofitId', select: '-password -providerid -provider'});
       data.msg = jwt.generate(req.userToken);
       statusCode = this.statusCode['success'];
     } catch(err) {
@@ -57,7 +57,8 @@ class ProjectController extends Response {
     let data, statusCode;
 
     try {
-      data = {err: false, msg: await dbHandler.find({nonprofitId: id})};
+      const projects = await dbHandler.population({nonprofitId: id}, {path: 'potential', select: '-password -providerid -provider'});
+      data = {err: false, msg: projects};
       statusCode = this.statusCode['success'];
     } catch(err) {
       statusCode = this.statusCode['not found'];
@@ -289,21 +290,15 @@ class ProjectController extends Response {
       }
       const project = await dbHandler.find({_id: req.body.id, isActive: true, isDraft: false, matched: false});
       if(project.length !== 1) {
-          console.log(project.length);
           throw new Error('incorrect number of projects');
       }
       const alMatched = await matchHandle.find({projectId: project[0]._id});
       if(alMatched.length !== 0) {
-          console.log(alMatched.length);
           throw new Error('incorrect number of matches');
       }
       await matchHandle.add({developerId: req.userToken._id, nonprofitId: project[0].nonprofitId, projectId: project[0]._id});
       project[0].matched = true;
-      project[0].potential = {
-          id: req.userToken._id,
-          url: req.userToken.url,
-          fname: req.userToken.fname
-      };
+      project[0].potential = req.userToken._id;
       project[0].save();
       data = {err: false, msg: 'Success'};
     }
@@ -398,12 +393,10 @@ class ProjectController extends Response {
         const matches = await matchHandle.find({projectId: id, nonprofitId: req.userToken._id});
         const project = await dbHandler.find({_id: id, nonprofitId: req.userToken._id, confirmed: false});
         if(matches.length !== 1 || project.length !== 1) {
-            console.log(matches.length, project.length);
             throw new Error('Improper number of matches or projects made');
         }
         if(decision === true) {
             matches[0].isMatched = true;
-            project[0].potential = null;
             project[0].matched = false;
             project[0].confirmed = true;
             await project[0].save();

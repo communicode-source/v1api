@@ -16,7 +16,7 @@ var Project = mongoose.Schema({
   totalCost: Number,
   matched: {type: Boolean, default: false},
   confirmed: {type: Boolean, default: false},
-  potential: {type: Object, default: null},
+  potential: {type: mongoose.Schema.Types.ObjectId, ref: "User", default: null},
   isDraft: { type: Boolean, default: true },
   isActive: { type: Boolean, default: false },
   isCompleted: { type: Boolean, default: false },

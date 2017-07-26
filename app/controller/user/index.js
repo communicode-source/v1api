@@ -247,6 +247,9 @@ class UserController extends Response {
         }
         try {
             if(fields.url && fields.url !== req.userToken.url) {
+               if(fields.url.indexOf('.') !== -1) {
+                  throw new Error('Not allowed to have periods in urls');
+               }
                 const check = await dbHandler.addQuery({url: fields.url}).readUsers();
                 if(check.length !== 0) {
                     throw new Error('Already taken');
