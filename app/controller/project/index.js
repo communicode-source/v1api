@@ -15,6 +15,28 @@ stripe.setApiVersion('2017-06-05');
 
 class ProjectController extends Response {
 
+  async findFinProject(req, res) {
+      const dbHandler = new ProjectHandler();
+      const id = req.body.id;
+
+      let data, statusCode;
+
+      try {
+        const proj = await dbHandler.population({_id: req.body.projectId, potential: req.userToken._id}, {path: 'potential', select: '-password -providerid -provider'});
+        if(proj.length !== 1) {
+            throw new Error('No project');
+        }
+        data = proj[0];
+        statusCode = this.statusCode['success'];
+      } catch(err) {
+        console.log(err);
+        data ={err: true};
+        statusCode = this.statusCode['success'];
+      }
+
+      return new Response(data, statusCode);
+  }
+
   async index(req, res) {
     const dbHandler = new ProjectHandler();
     const activity = new ActivityFeedHandler();
@@ -178,7 +200,7 @@ class ProjectController extends Response {
 
     try {
 
-      const customerInfo = await user.isUserCustomer(req.body.id.sanitize());
+      const customerInfo = await user.isUserCustomer(req.userToken._id);
 
       if(!customerInfo.customer.isCustomer) {
         const customer = await stripe.customers.create({
@@ -415,6 +437,68 @@ class ProjectController extends Response {
       }
 
       return new Response(data, statusCode);
+  }
+
+  async payDev(req, res) {
+      const dbHandler = new ProjectHandler();
+      const matchHandle = new MatchHandler();
+      const user = new UserHandler();
+      let data, statusCode = 200;
+      let customer;
+      try {
+          if(req.userToken.accountType !== false) {
+              throw new Error('User not a dev');
+          }
+          const token = req.body.stripeToken;
+          let match = await matchHandle.find({projectId: req.body.params.projectId, developerId: req.userToken._id});
+          let project = await dbHandler.find({_id: req.body.params.projectId, potential: req.userToken._id, isCompleted: true});
+          const customerInfo = await user.isUserCustomer(req.userToken.id);
+          if(!customerInfo.customer.isCustomer) {
+              customer = this.createStripeRUser(req.body.name, customerInfo.email, token);
+              customerInfo.customer.isCustomer = true;
+              customerInfo.customer.customerId = customer.id;
+              customerInfo.customer.other = customer;
+              customerInfo.save();
+              console.log('RIGHT HERE PLEASE');
+              console.log('Customer', customer);
+              console.log('StripeToken', token);
+              console.log('Req', req.userToken);
+          }
+          else {
+              customer = {id: customerInfo.customer.customerId};
+          }
+          if(match.length !== 1 || project.length !== 1) {
+              throw new Error(match.length + ' or ' + project.length + ' is not right');
+          }
+          match = match[0];
+          project = project[0];
+          if(!match.cost) {
+              throw new Error('Volunteer project, not a paid project');
+          }
+          priceToDev = Math.floor((+match.cost * .901));
+          priceToUs = Math.floor((+match.cost * .07) - 30);
+          throw new Error('I dont want to actually test a charge yet');
+          const payout = await stripe.payouts.create({
+            amount: priceToDev,
+            currency: 'usd',
+            recipient: customer.id,
+            card: 'thisshouldbecardid',
+            statement_descriptor: 'Thank you for helping on Communicode!!'
+          });
+          console.log(payout);
+      }
+      catch(e) {
+          data = {err: true, msg: 'Failed'};
+      }
+  }
+
+  async createStripeRUser(name, email, token) {
+      return await stripe.recipients.create({
+        name: name,
+        type: 'individual',
+        card: token,
+        email: email
+      });
   }
 
 }

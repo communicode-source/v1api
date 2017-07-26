@@ -61,6 +61,13 @@ router.route('/:id')
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
+router.route('/get')
+  .post( requireLogin, async (req, res) => {
+    const response = await controller.findFinProject(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+  });
+
 router.route('/find/:id')
   .get( async (req, res) => {
     const response = await controller.findProjectByNP(req, res);
@@ -78,6 +85,13 @@ router.route('/complete')
 router.route('/matchdev')
   .post( requireLogin, async (req, res) => {
     const response = await controller.matchDev(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+});
+
+router.route('/payout')
+  .post( requireLogin, async (req, res) => {
+    const response = await controller.payDev(req, res);
 
     res.status(response.getStatusCode()).json(response.getJSONData());
 });
