@@ -37,6 +37,14 @@ router.route('/update/:id')
       res.status(response.getStatusCode()).json(response.getJSONData());
     });
 
+router.route('/update/volunteer/active')
+
+  .put( requireLogin, async (req, res) => {
+    const response = await controller.updateVolunteerActive(req, res);
+
+    res.status(response.getStatusCode()).json(response.getJSONData());
+  });
+
 router.route('/charge')
 
     .post( requireLogin, async (req, res) => {
