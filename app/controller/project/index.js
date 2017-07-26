@@ -355,6 +355,26 @@ class ProjectController extends Response {
     return new Response(data, statusCode);
   }
 
+  async updateVolunteerActive(req, res) {
+    const dbHandler = new ProjectHandler();
+    const activity = new ActivityFeedHandler();
+
+    let data, statusCode, project;
+
+    try {
+      project = await dbHandler.updateById(req.userToken._id, { isActive: true, isDraft: false});
+
+      data = jwt.generate(req.userToken);
+
+      statusCode = this.statusCode['success'];
+    } catch(err) {
+      console.log(err);
+      data = { msg: 'Something went wrong' };
+      statusCode = this.statusCode['error'];
+    }
+
+    return new Response(data, statusCode);
+  }
 
 }
 
