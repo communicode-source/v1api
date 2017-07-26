@@ -146,15 +146,17 @@ class ProjectController extends Response {
       const chargeHandle = new ChargeHandler();
       let data, statusCode = 200;
       try {
-          let proj = await dbHandler.find({_id: req.body.id, nonprofitId: req.userToken._id, isActive: false});
+          let proj = await dbHandler.find({_id: req.body.id, nonprofitId: req.userToken._id, matched: false});
           let charge = await chargeHandle.find({nonprofitId: req.userToken._id, projectId: req.body.id});
-          if(proj.length !== 1 || charge.length !== 1) {
+          if(proj.length !== 1) {
               throw new Error('Invalid number of projects');
           }
-          await stripe.refunds.create({
-              charge: charge[0].chargeId,
-              amount: Math.ceil(+charge[0].cost * .901)
-          })
+          if(charge.length === 1) {
+              await stripe.refunds.create({
+                  charge: charge[0].chargeId,
+                  amount: Math.ceil(+charge[0].cost * .901)
+              })
+          }
           proj = proj[0];
           proj.isActive = false;
           proj.nonprofitId = null;
@@ -299,7 +301,8 @@ class ProjectController extends Response {
       project[0].matched = true;
       project[0].potential = {
           id: req.userToken._id,
-          url: req.userToken.url
+          url: req.userToken.url,
+          fname: req.userToken.fname
       };
       project[0].save();
       data = {err: false, msg: 'Success'};
@@ -362,18 +365,63 @@ class ProjectController extends Response {
     let data, statusCode, project;
 
     try {
-      project = await dbHandler.updateById(req.userToken._id, { isActive: true, isDraft: false});
+      project = await dbHandler.find({nonprofitId: req.userToken._id, isActive: false, isDraft: true, type: 'SplashPage'});
+      if(project.length !== 1) {
+          throw new Error('incorrect number of projects');
+      }
+      project[0].isActive = true;
+      project[0].isDraft = false;
+      await project[0].save();
 
-      data = jwt.generate(req.userToken);
+      data = {err: false, msg: 'Success'};
 
       statusCode = this.statusCode['success'];
     } catch(err) {
       console.log(err);
-      data = { msg: 'Something went wrong' };
+      data = {err: true, msg: 'Something went wrong' };
       statusCode = this.statusCode['error'];
     }
 
     return new Response(data, statusCode);
+  }
+
+  async npDecision(req, res) {
+      const decision = req.body.decision;
+      const id = req.body.id;
+      const dbHandler = new ProjectHandler();
+      const matchHandle = new MatchHandler();
+      let data, statusCode = 200;
+      try {
+        if(req.userToken.accountType !== true) {
+            throw new Error('Invalid account type');
+        }
+        const matches = await matchHandle.find({projectId: id, nonprofitId: req.userToken._id});
+        const project = await dbHandler.find({_id: id, nonprofitId: req.userToken._id, confirmed: false});
+        if(matches.length !== 1 || project.length !== 1) {
+            console.log(matches.length, project.length);
+            throw new Error('Improper number of matches or projects made');
+        }
+        if(decision === true) {
+            matches[0].isMatched = true;
+            project[0].potential = null;
+            project[0].matched = false;
+            project[0].confirmed = true;
+            await project[0].save();
+            await matches[0].save();
+        }
+        else {
+            matches[0].remove();
+            project[0].potential = null;
+            project[0].matched = false;
+            await project[0].save();
+        }
+        data = {err: false, msg: 'Succeeded to make decision'};
+
+      } catch(err) {
+        data = { err: true, msg: 'Something went wrong' };
+      }
+
+      return new Response(data, statusCode);
   }
 
 }

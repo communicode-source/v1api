@@ -22,11 +22,11 @@ router.route('/')
 
 router.route('/all')
 
-  .post( requireLogin, async (req, res) => {
-    const response = await controller.index(req, res);
+.post( requireLogin, async (req, res) => {
+  const response = await controller.index(req, res);
 
-    res.status(response.getStatusCode()).json(response.getJSONData());
-  });
+  res.status(response.getStatusCode()).json(response.getJSONData());
+});
 
 
 router.route('/update/:id')
@@ -96,5 +96,12 @@ router.route('/bookmark')
 
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
+
+router.route('/decide')
+.post( requireLogin, async (req, res) => {
+  const response = await controller.npDecision(req, res);
+
+  res.status(response.getStatusCode()).json(response.getJSONData());
+});
 
 export default router;
