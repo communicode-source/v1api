@@ -134,7 +134,7 @@ class UserHandler {
   }
 
   isUserCustomer(id) {
-    return User.findOne({'_id': id}, 'customer').exec();
+    return User.findOne({'_id': id}).exec();
   }
 
   updateUserIsCustomer(id, customerId) {

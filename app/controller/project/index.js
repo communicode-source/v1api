@@ -452,13 +452,15 @@ class ProjectController extends Response {
           const token = req.body.stripeToken;
           let chargeOp = await chargeHandle.find({projectId: req.body.id});
           let project = await dbHandler.find({_id: req.body.id, potential: req.userToken._id, isCompleted: true});
-          const customerInfo = await user.isUserCustomer(req.userToken._id);
+          let customerInfo = await user.addQuery({_id: req.userToken._id}).readUsers();
+          if(customerInfo.length !== 1) {
+              throw new Error('Invalid quantity of users');
+          }
+          customerInfo = customerInfo[0];
           if(!customerInfo.customer.isCustomer) {
               customer = await this.createStripeRUser(customerInfo.fname, customerInfo.lname, customerInfo.email, token);
-              customerInfo.customer.isCustomer = true;
-              customerInfo.customer.customerId = customer.id;
-              customerInfo.customer.other = customer;
-              customerInfo.save();
+              customerInfo.customer = {isCustomer: true, customerId: customer.id};
+              await customerInfo.save();
           }
           else {
               customer = {id: customerInfo.customer.customerId};
@@ -472,7 +474,7 @@ class ProjectController extends Response {
               throw new Error('Volunteer project, not a paid project');
           }
           const priceToDev = Math.floor((+chargeOp.cost * .901));
-          const priceToUs = Math.floor((+chargeOp.cost * .07) - 60);
+          const priceToUs = Math.floor((+chargeOp.cost * .07) - 60); // our cut minus the 30 + 25 cents for transaction fees. (5 cent buffer)
 
           // const payout = await stripe.payouts.create({
           //   amount: priceToDev,
@@ -487,16 +489,8 @@ class ProjectController extends Response {
             amount: priceToDev,
             currency: 'usd',
             destination: customer.id,
-            transfer_schedule: {
-              delay_days: 1,
-              interval: 'daily'
-            },
-            statement_descriptor: 'Thank you for helping!!'
-          },
-          {
-            stripe_account: customer.id
           });
-          console.log(await payout);
+          console.log(payout);
           data = {err: false, msg: 'You should receive payment soon!'};
       }
       catch(e) {
@@ -508,8 +502,6 @@ class ProjectController extends Response {
 
   async createStripeRUser(fname, lname, email, token) {
       return await stripe.accounts.create({
-        first_name: fname,
-        lname: lname,
         country: 'US',
         type: 'custom',
         email: email,
@@ -527,6 +519,10 @@ class ProjectController extends Response {
         tos_acceptance: {
             date: Math.floor(Date.now() / 1000),
             ip: token.client_ip
+        },
+        payout_schedule: {
+            delay_days: 2,
+            interval: 'daily'
         }
       });
   }
