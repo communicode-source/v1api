@@ -451,7 +451,10 @@ class ProjectController extends Response {
           }
           const token = req.body.stripeToken;
           let chargeOp = await chargeHandle.find({projectId: req.body.id});
-          let project = await dbHandler.find({_id: req.body.id, potential: req.userToken._id, isCompleted: true});
+          let project = await dbHandler.find({_id: req.body.id, potential: req.userToken._id, isCompleted: true, paid: false});
+          if(chargeOp.length !== 1 || project.length !== 1) {
+              throw new Error(chargeOp.length + ' or ' + project.length + ' is not right');
+          }
           let customerInfo = await user.addQuery({_id: req.userToken._id}).readUsers();
           if(customerInfo.length !== 1) {
               throw new Error('Invalid quantity of users');
@@ -464,9 +467,30 @@ class ProjectController extends Response {
           }
           else {
               customer = {id: customerInfo.customer.customerId};
-          }
-          if(chargeOp.length !== 1 || project.length !== 1) {
-              throw new Error(chargeOp.length + ' or ' + project.length + ' is not right');
+              await stripe.accounts.update(
+                  customer.id,
+                  {
+                    external_account: token.id,
+                    legal_entity: {
+                      first_name: customer.fname,
+                      last_name: customer.lname,
+                      dob: {
+                          day: 28,
+                          month: 9,
+                          year: 1998
+                      },
+                      address: {
+                        city: 'Westfield',
+                        country: 'US',
+                        line1: '14636 Bixby Drive',
+                        line2: null,
+                        postal_code: 46074,
+                        state: 'Indiana'
+                      },
+                      ssn_last_4: 1234
+                    }
+                  }
+              );
           }
           chargeOp = chargeOp[0];
           project = project[0];
@@ -476,21 +500,13 @@ class ProjectController extends Response {
           const priceToDev = Math.floor((+chargeOp.cost * .901));
           const priceToUs = Math.floor((+chargeOp.cost * .07) - 60); // our cut minus the 30 + 25 cents for transaction fees. (5 cent buffer)
 
-          // const payout = await stripe.payouts.create({
-          //   amount: priceToDev,
-          //   currency: 'usd',
-          //   method: 'instant',
-          //   statement_descriptor: 'Thank you for helping on Communicode!!'
-          // },
-          // {
-          //   stripe_account: customer.id
-          // });
           const payout = await stripe.transfers.create({
             amount: priceToDev,
             currency: 'usd',
             destination: customer.id,
           });
-          console.log(payout);
+          project.paid = true;
+          await project.save();
           data = {err: false, msg: 'You should receive payment soon!'};
       }
       catch(e) {
@@ -514,7 +530,15 @@ class ProjectController extends Response {
           },
           first_name: fname,
           last_name: lname,
-          type: 'individual'
+          type: 'individual',
+          address: {
+            city: 'Westfield',
+            country: 'US',
+            line1: '14636 Bixby Drive',
+            line2: null,
+            postal_code: 46074,
+            state: 'Indiana'
+          }
         },
         tos_acceptance: {
             date: Math.floor(Date.now() / 1000),
