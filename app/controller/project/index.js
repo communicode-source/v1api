@@ -380,9 +380,8 @@ class ProjectController extends Response {
     const activity = new ActivityFeedHandler();
 
     let data, statusCode, project;
-
     try {
-      project = await dbHandler.find({nonprofitId: req.userToken._id, isActive: false, isDraft: true, type: 'SplashPage'});
+      project = await dbHandler.find({_id: req.body.projectId.projectId, nonprofitId: req.userToken._id, isActive: false, isDraft: true});
       if(project.length !== 1) {
           throw new Error('incorrect number of projects');
       }
