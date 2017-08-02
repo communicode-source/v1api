@@ -8,8 +8,9 @@ import home from './home';
 import jwt from './jwt';
 import projects from './projects';
 import recover from './recover';
-import secure from './secure';
 import search from './search';
+import secure from './secure';
+import stripeUser from './stripeuser';
 import test from './test';
 import verify from './verify';
 import connection from './connection';
@@ -23,6 +24,7 @@ const routes = {
   '/recover': recover,
   '/secure': secure,
   '/search' : search,
+  '/stripeuser': stripeUser,
   '/test' : test,
   '/update': callbacks,
   '/verify': verify,

@@ -15,6 +15,7 @@ import UserHandler from './../../db/handler/user'
 import {LoginDataPull, verifyExternalLoginUser, isLocalUser, createLocalUser, createExternalUser, uniqueUser, ensureOnlyOne} from './../../utils/validations'
 import ActivityFeedHandler from './../../db/handler/activity';
 import mongoose from 'mongoose';
+import requester from 'request';
 
 import uuidV4 from 'uuid/v4';
 import storage from '@google-cloud/storage';
@@ -332,6 +333,60 @@ class UserController extends Response {
           }
         });
       });
+    }
+
+    async createStripeUser(req, res) {
+        const dbHandler = new UserHandler();
+        try {
+            if(await req.startSessUser(req, req.query.state) === false) {
+                throw new Error('Invalid token');
+            }
+            if(req.query.scope !== 'read_write') {
+                throw new Error('Invalid permissions');
+            }
+            if(req.userToken.accountType !== false) {
+                throw new Error('Not a developer');
+            }
+            const userId = req.userToken._id;
+            const code = req.query.code;
+            const options = {
+                uri: 'https://connect.stripe.com/oauth/token',
+                port: 443,
+                path: '/',
+                method: 'POST',
+                json: true,
+                body: {
+                  grant_type: 'authorization_code',
+                  client_id: 'pk_test_KHkaXlde5Ci5F4KGhLgAEW1r',
+                  client_secret: 'sk_test_v6YuHnfOi5QjZlIORYJDyUq6',
+                  code: code
+                }
+            };
+            requester(options, async (err, r, body) => {
+                if(err) {
+                    console.log(err);
+                    throw new Error('Invalid User');
+                }
+                const customerId = body.stripe_user_id;
+                const users = await dbHandler.addQuery({_id: userId}).readUsers();
+                if(users.length !== 1) {
+                    throw new Error('Incorrect number of users');
+                }
+                if(users[0].customer.isCustomer === true) {
+                    throw new Error('Already a customer');
+                }
+                users[0].customer = {
+                    isCustomer: true,
+                    customerId: customerId
+                };
+                await users[0].save();
+                res.status(200).send('Success. Go back to Communicode!');
+            })
+        }
+        catch(e) {
+            console.log(e);
+            res.status(401).send('Sorry, try again at another time.');
+        }
     }
 }
 
