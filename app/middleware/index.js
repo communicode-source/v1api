@@ -14,6 +14,8 @@ import sanitize from 'sanitizer';
 
 module.exports = (app) => {
 
+
+ // Altering prototypes to help with security things.
   String.prototype.sanitize = function() {
       return sanitize.escape(this.toString());
   }
@@ -28,6 +30,22 @@ module.exports = (app) => {
           return true;
       }
       return false;
+  }
+
+  Object.prototype.removeKeys = function(objectToRemove) {
+  		for(const i in this) {
+      		if(objectToRemove.indexOf(i) !== -1) {
+          		delete this[i];
+          }
+      }
+  }
+
+  Object.prototype.onlyKeys = function(objectToKeep) {
+  		for(const i in this) {
+      		if(objectToKeep.indexOf(i) === -1) {
+          		delete this[i];
+          }
+      }
   }
 
   app.set('port', process.env.PORT || 3000);
