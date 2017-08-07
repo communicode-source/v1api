@@ -150,6 +150,10 @@ class ProjectController extends Response {
       if(req.userToken.accountType !== true) {
           throw new Error('incorrect user type');
       }
+      const ensureDraft = await dbHandler.find({_id: req.params.id, isDraft: true, nonprofitId: req.userToken._id, paid: false});
+      if(ensureDraft.length !== 1) {
+          throw new Error('Not valid number of projects');
+      }
       project = await dbHandler.updateById(req.params.id, {...req.body.project});
 
       data = jwt.generate(req.userToken);
@@ -448,7 +452,6 @@ class ProjectController extends Response {
           if(req.userToken.accountType !== false) {
               throw new Error('User not a dev');
           }
-          const token = req.body.stripeToken;
           let chargeOp = await chargeHandle.find({projectId: req.body.id});
           let project = await dbHandler.find({_id: req.body.id, potential: req.userToken._id, isCompleted: true, paid: false});
           if(chargeOp.length !== 1 || project.length !== 1) {
@@ -473,6 +476,10 @@ class ProjectController extends Response {
             currency: 'usd',
             destination: customer.id,
           });
+          const ourPay = await stripe.payouts.create({
+            amount: priceToUs,
+            currency: "usd",
+          });
           project.paid = true;
           await project.save();
           data = {err: false, msg: 'You should receive payment soon!'};
@@ -482,41 +489,6 @@ class ProjectController extends Response {
           data = {err: true, msg: 'Failed'};
       }
       return new Response(data, statusCode);
-  }
-
-  async createStripeRUser(fname, lname, email, token) {
-      return await stripe.accounts.create({
-        country: 'US',
-        type: 'custom',
-        email: email,
-        external_account: token.id,
-        legal_entity: {
-          dob: {
-              day: 28,
-              month: 9,
-              year: 1998
-          },
-          first_name: fname,
-          last_name: lname,
-          type: 'individual',
-          address: {
-            city: 'Westfield',
-            country: 'US',
-            line1: '14636 Bixby Drive',
-            line2: null,
-            postal_code: 46074,
-            state: 'Indiana'
-          }
-        },
-        tos_acceptance: {
-            date: Math.floor(Date.now() / 1000),
-            ip: token.client_ip
-        },
-        payout_schedule: {
-            delay_days: 2,
-            interval: 'daily'
-        }
-      });
   }
 
 }
