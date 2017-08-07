@@ -454,43 +454,12 @@ class ProjectController extends Response {
           if(chargeOp.length !== 1 || project.length !== 1) {
               throw new Error(chargeOp.length + ' or ' + project.length + ' is not right');
           }
-          let customerInfo = await user.addQuery({_id: req.userToken._id}).readUsers();
+          let customerInfo = await user.addQuery({_id: req.userToken._id, 'customer.isCustomer': true}).readUsers();
           if(customerInfo.length !== 1) {
               throw new Error('Invalid quantity of users');
           }
           customerInfo = customerInfo[0];
-          if(!customerInfo.customer.isCustomer) {
-              customer = await this.createStripeRUser(customerInfo.fname, customerInfo.lname, customerInfo.email, token);
-              customerInfo.customer = {isCustomer: true, customerId: customer.id};
-              await customerInfo.save();
-          }
-          else {
-              customer = {id: customerInfo.customer.customerId};
-              await stripe.accounts.update(
-                  customer.id,
-                  {
-                    external_account: token.id,
-                    legal_entity: {
-                      first_name: customer.fname,
-                      last_name: customer.lname,
-                      dob: {
-                          day: 28,
-                          month: 9,
-                          year: 1998
-                      },
-                      address: {
-                        city: 'Westfield',
-                        country: 'US',
-                        line1: '14636 Bixby Drive',
-                        line2: null,
-                        postal_code: 46074,
-                        state: 'Indiana'
-                      },
-                      ssn_last_4: 1234
-                    }
-                  }
-              );
-          }
+          customer = {id: customerInfo.customer.customerId};
           chargeOp = chargeOp[0];
           project = project[0];
           if(!chargeOp.cost) {

@@ -30,6 +30,10 @@ class RecoveryHandler {
         return;
     }
 
+    find(params) {
+        return Recovery.find(params).exec();
+    }
+
     getUserID(id) {
         return Recovery.find({_id: id, changed: false}).exec();
     }

@@ -11,6 +11,7 @@ import jwt from './../jwt'
 import Response from './../Response.js'
 // Require the Handler for the user.
 import UserHandler from './../../db/handler/user'
+import recoveryHandler from './../../db/handler/recovery'
 // Utilities for the logins and sign ups because they contain a lot of logic.
 import {LoginDataPull, verifyExternalLoginUser, isLocalUser, createLocalUser, createExternalUser, uniqueUser, ensureOnlyOne} from './../../utils/validations'
 import ActivityFeedHandler from './../../db/handler/activity';
@@ -18,6 +19,8 @@ import mongoose from 'mongoose';
 import requester from 'request';
 
 import uuidV4 from 'uuid/v4';
+import crypto from 'crypto';
+import Mailer from './../email';
 import storage from '@google-cloud/storage';
 import fs from 'fs';
 
@@ -243,6 +246,8 @@ class UserController extends Response {
         }
         delete fields.password;
         delete fields._id;
+        delete fields.customer;
+        delete fields.providerid;
         if(fields.city && fields.country) {
             fields.location = [fields.city, fields.country];
         }
@@ -386,6 +391,49 @@ class UserController extends Response {
         catch(e) {
             console.log(e);
             res.status(401).send('Sorry, try again at another time.');
+        }
+    }
+    
+    async sendEmailForStripe(req, res) {
+        const dbHandler = new UserHandler();
+        const hash = await crypto.randomBytes(12).toString('hex');
+        const html = `<html><h4>Code: ${url}</h4><p>Copy and paste this into the next textbox</p> </html>`;
+        let data;
+        try {
+            let user = await dbHandler.addQuery({_id: req.userToken._id}).readUsers();
+            if(user.length !== 1) {
+                throw new Error('Could not find user');
+            }
+            const mail = await new Mailer([user.email], 'Remove Stripe Account').html(html).sendMail();
+            const record = await dbRecoveryHandler.insertHash(hash, null, user._id);
+            data = {err: false, msg: 'Check you email!'};
+        }
+        catch(e) {
+            console.log(e.message);
+            data = {err: true, msg: e.message};
+        }
+    }
+
+    async deleteStripeUser(req, res) {
+        const dbHandler = new UserHandler();
+        const codeHandler = new recoveryHandler();
+        let data;
+        try {
+            const match = await codeHandler.find({urlHash: req.body.code});
+            if(match.length !== 1) {
+                throw new Error('Not found');
+            }
+            const user = await dbHandler.addQuery({_id: match[0].userID, 'customer.isCustomer': true}).readUsers();
+            if(user.length !== 1) {
+                throw new Error('User not found');
+            }
+            user[0].customer = {isCustomer: false, customerId: null};
+            await user[0].save();
+            data = {err: false, msg: 'Successfully unlinked Stripe account'};
+        }
+        catch(e) {
+            console.log(e.message);
+            data = {err: true, msg: e.message};
         }
     }
 }

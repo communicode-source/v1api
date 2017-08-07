@@ -6,7 +6,8 @@ var Recover = mongoose.Schema({
     userHash: String,
     checked: Boolean,
     changed: Boolean,
-    timestamp: String
+    timestamp: String,
+    purpose: {type: String, default: 'recovery'},
 });
 
 module.exports = mongoose.model('Recover', Recover);
