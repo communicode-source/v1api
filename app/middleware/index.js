@@ -31,7 +31,7 @@ module.exports = (app) => {
       }
       return false;
   }
-
+  // Weird glitch. This causes mongoose to fail.
   // Object.prototype.removeKeys = function(objectToRemove) {
   // 		for(const i in this) {
   //     		if(objectToRemove.indexOf(i) !== -1) {
