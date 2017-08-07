@@ -20,7 +20,7 @@ export let LoginDataPull = user => {
     education: user.education,
     socials: user.socials,
     image: user.image,
-    customer: user.customer
+    customer: {isCustomer: user.customer.isCustomer}
   }
 }
 

@@ -50,11 +50,38 @@ router.route('/avatar/upload')
 
 router.route('/cover/upload')
 
-  .post(requireLogin, async(req, res) => {
-      const response = await controller.uploadCover(req, res);
-      if(response) {
-          res.status(response.getStatusCode()).json(response.getJSONData());
-      }
-  });
+.post(requireLogin, async(req, res) => {
+    const response = await controller.uploadCover(req, res);
+    if(response) {
+        res.status(response.getStatusCode()).json(response.getJSONData());
+    }
+});
+
+router.route('/unlink/getemail')
+.put(requireLogin, async(req, res) => {
+    const response = await controller.sendEmailForStripe(req, res);
+    if(response) {
+        res.status(response.getStatusCode()).json(response.getJSONData());
+    }
+});
+
+router.route('/unlink/stripe')
+.put(requireLogin, async(req, res) => {
+    const response = await controller.deleteStripeUser(req, res);
+    if(response) {
+        res.status(response.getStatusCode()).json(response.getJSONData());
+    }
+});
+
+router.route('/me')
+.post(requireLogin, async(req, res) => {
+    const response = await controller.getLoggedInUser(req, res);
+    if(response) {
+        res.status(response.getStatusCode()).json(response.getJSONData());
+    }
+    else {
+        res.send('Failed');
+    }
+});
 
 export default router;

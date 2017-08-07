@@ -71,7 +71,6 @@ router.route('/get')
 router.route('/find/:id')
   .get( async (req, res) => {
     const response = await controller.findProjectByNP(req, res);
-
     res.status(response.getStatusCode()).json(response.getJSONData());
 });
 

@@ -13,7 +13,7 @@ class RecoveryHandler {
     }
 
     checkUser(id) {
-        return Recovery.find({userID: id, changed: false}).exec();
+        return Recovery.find({userID: id, changed: false, purpose: 'recovery'}).exec();
     }
 
     async updateChecked(url, user) {

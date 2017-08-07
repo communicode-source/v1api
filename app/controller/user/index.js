@@ -70,6 +70,23 @@ class UserController extends Response {
     return new Response(data, status)
   }
 
+  async getLoggedInUser(req, res) {
+      const dbHandler = new UserHandler();
+      let data;
+      try {
+          let user = await dbHandler.addQuery({_id: req.userToken._id}).readUsers();
+          if(user.length !== 1) {
+              throw new Error('No user like that');
+          }
+          user = user[0];
+          data = {err: false, msg: LoginDataPull(user)};
+      }
+      catch(e) {
+          data = {err: true, msg: 'Failed'};
+      }
+      return new Response(data, 200)
+  }
+
 
     async createUser(req, res) {
       // Declarations of constants
@@ -396,6 +413,7 @@ class UserController extends Response {
 
     async sendEmailForStripe(req, res) {
         const dbHandler = new UserHandler();
+        const dbRecoveryHandler = new recoveryHandler();
         const hash = await crypto.randomBytes(12).toString('hex');
         const html = `<html><h4>Code: ${hash}</h4><p>Copy and paste this into the next textbox</p> </html>`;
         let data;
@@ -404,14 +422,25 @@ class UserController extends Response {
             if(user.length !== 1) {
                 throw new Error('Could not find user');
             }
+            user = user[0];
+            const previous = await dbRecoveryHandler.find({userID: user._id, purpose: 'stripe'});
+            if(previous.length !== 0) {
+                if(previous.length === 1) {
+                    await previous[0].remove();
+                }
+                else {
+                    throw new Error('Something went wrong!');
+                }
+            }
             const mail = await new Mailer([user.email], 'Remove Stripe Account').html(html).sendMail();
             const record = await dbRecoveryHandler.insertHash(hash, null, user._id, 'stripe');
             data = {err: false, msg: 'Check you email!'};
         }
         catch(e) {
-            console.log(e.message);
+            console.log(e);
             data = {err: true, msg: e.message};
         }
+        return new Response(data, 200);
     }
 
     async deleteStripeUser(req, res) {
@@ -419,8 +448,9 @@ class UserController extends Response {
         const codeHandler = new recoveryHandler();
         let data;
         try {
-            const match = await codeHandler.find({urlHash: req.body.code});
-            if(match.length !== 1) {
+            const match = await codeHandler.find({urlHash: req.body.code, userID: req.userToken._id, changed: false});
+            const now = new Date().getTime();
+            if(match.length !== 1  || req.userToken.accountType !== false || match[0].timestamp < now - (15 * 60 * 1000)) {
                 throw new Error('Not found');
             }
             const user = await dbHandler.addQuery({_id: match[0].userID, 'customer.isCustomer': true}).readUsers();
@@ -428,6 +458,8 @@ class UserController extends Response {
                 throw new Error('User not found');
             }
             user[0].customer = {isCustomer: false, customerId: null};
+            match[0].changed = true;
+            await match[0].save();
             await user[0].save();
             data = {err: false, msg: 'Successfully unlinked Stripe account'};
         }
@@ -435,6 +467,7 @@ class UserController extends Response {
             console.log(e.message);
             data = {err: true, msg: e.message};
         }
+        return new Response(data, 200);
     }
 }
 
