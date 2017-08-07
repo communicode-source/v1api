@@ -4,8 +4,8 @@ import mongoose from 'mongoose';
 import Recovery from './../../model/recovery';
 
 class RecoveryHandler {
-    insertHash(url, user, id) {
-        return new Recovery({urlHash: url, userHash: user, userID: id, timestamp: new Date().getTime(), checked: false, changed: false}).save();
+    insertHash(url, user, id, type) {
+        return new Recovery({urlHash: url, userHash: user, userID: id, timestamp: new Date().getTime(), checked: false, changed: false, purpose: type || 'recovery'}).save();
     }
 
     findHash(url, user) {

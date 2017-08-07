@@ -393,11 +393,11 @@ class UserController extends Response {
             res.status(401).send('Sorry, try again at another time.');
         }
     }
-    
+
     async sendEmailForStripe(req, res) {
         const dbHandler = new UserHandler();
         const hash = await crypto.randomBytes(12).toString('hex');
-        const html = `<html><h4>Code: ${url}</h4><p>Copy and paste this into the next textbox</p> </html>`;
+        const html = `<html><h4>Code: ${hash}</h4><p>Copy and paste this into the next textbox</p> </html>`;
         let data;
         try {
             let user = await dbHandler.addQuery({_id: req.userToken._id}).readUsers();
@@ -405,7 +405,7 @@ class UserController extends Response {
                 throw new Error('Could not find user');
             }
             const mail = await new Mailer([user.email], 'Remove Stripe Account').html(html).sendMail();
-            const record = await dbRecoveryHandler.insertHash(hash, null, user._id);
+            const record = await dbRecoveryHandler.insertHash(hash, null, user._id, 'stripe');
             data = {err: false, msg: 'Check you email!'};
         }
         catch(e) {
