@@ -117,4 +117,11 @@ router.route('/decide')
   res.status(response.getStatusCode()).json(response.getJSONData());
 });
 
+router.route('/developer')
+.post( requireLogin, async (req, res) => {
+  const response = await controller.findDevProjects(req, res);
+
+  res.status(response.getStatusCode()).json(response.getJSONData());
+});
+
 export default router;

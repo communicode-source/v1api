@@ -37,6 +37,23 @@ class ProjectController extends Response {
       return new Response(data, statusCode);
   }
 
+  async findDevProjects(req, res) {
+      const dbHandler = new ProjectHandler();
+      let data;
+      try {
+          if(req.userToken.accontType === true) {
+              throw new Error('You are not permitted to access this (developers only)');
+          }
+          const projects = await dbHandler.find({potential: req.userToken._id});
+          data = {err: false, msg: projects};
+      }
+      catch(e) {
+          console.log(e);
+          data = {err: true, msg: e.message};
+      }
+      return new Response(data, 200);
+  }
+
   async index(req, res) {
     const dbHandler = new ProjectHandler();
     const activity = new ActivityFeedHandler();
