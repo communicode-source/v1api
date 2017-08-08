@@ -1,0 +1,23 @@
+export default {
+    SplashPage: 'volunteer',
+    MultiplePageStaticWebsite: 50,
+    WebsiteWithABlog: 75,
+    WebsiteWithMultipleContentSources: 250,
+    UserAccountWebsite: 500,
+    ECommerceWebsite: 2000,
+    SmallIOSApplication: 150,
+    SmallAndroidApplication: 150,
+    Issue: 'volunteer',
+    SetupAdvice: 'volunteer',
+    DomainNameSetup: 'volunteer',
+    HostingSetup: 'volunteer',
+    DomainAndHostingSetup: 'volunteer',
+    DataBackup: 'volunteer',
+    WebsiteTransfer: 25,
+    MediumCloudArchitecture: 50,
+    LargeCloudArchitecture: 100,
+    APIDevelopment: 50,
+    SmallDevelopmentFeature: 50,
+    MediumDevelopmentFeature: 100,
+    LargeDevelopmentFeature: 200
+};

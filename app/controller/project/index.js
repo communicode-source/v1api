@@ -8,9 +8,11 @@ import ActivityFeedHandler from './../../db/handler/activity';
 import UserHandler from './../../db/handler/user';
 import ChargeHandler from './../../db/handler/charge';
 import MatchHandler from './../../db/handler/match';
-import {LoginDataPull} from './../../utils/validations'
+import {LoginDataPull} from './../../utils/validations';
 
-var stripe = require('stripe')('sk_test_v6YuHnfOi5QjZlIORYJDyUq6');
+import prices from './../../config/prices';
+
+const stripe = require('stripe')('sk_test_v6YuHnfOi5QjZlIORYJDyUq6');
 stripe.setApiVersion('2017-06-05');
 
 class ProjectController extends Response {
@@ -231,6 +233,8 @@ class ProjectController extends Response {
 
       const customerInfo = await user.isUserCustomer(req.userToken._id);
 
+      let price = (prices[req.body.type] / 0.901).toFixed(2);
+
       if(!customerInfo.customer.isCustomer) {
         const customer = await stripe.customers.create({
           email: req.body.email,
@@ -238,15 +242,15 @@ class ProjectController extends Response {
         });
 
         const charge = await stripe.charges.create({
-            amount: Math.floor((+req.body.price * 100)),
+            amount: Math.floor((price * 100)),
             currency: "USD",
             customer: customer.id
         });
         if(charge.paid) {
           data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
-          const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false, totalCost: req.body.price });
+          const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false, totalCost: price });
           const newCustomer = await user.updateUserIsCustomer(req.body.id.sanitize(), customer.id);
-          await chargeHandle.add({cost: Math.floor((+req.body.price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customer.id, projectId: req.body.projectId});
+          await chargeHandle.add({cost: Math.floor((price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customer.id, projectId: req.body.projectId});
           if(newCustomer) {
             statusCode = 200;
           } else {
@@ -260,11 +264,11 @@ class ProjectController extends Response {
 
       } else {
         const charge = await stripe.charges.create({
-            amount: Math.floor((+req.body.price * 100)),
+            amount: Math.floor((price * 100)),
             currency: "USD",
             customer: customerInfo.customer.customerId
         });
-        await chargeHandle.add({cost: Math.floor((+req.body.price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customerInfo.customer.customerId, projectId: req.body.projectId});
+        await chargeHandle.add({cost: Math.floor((price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customerInfo.customer.customerId, projectId: req.body.projectId});
         if(charge.paid) {
           const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false });
           data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
@@ -281,7 +285,7 @@ class ProjectController extends Response {
 
     } catch(err) {
       console.log(err);
-      data = { msg: 'Something went wrong'};
+      data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
       statusCode = this.statusCode['not found'];
     }
 
