@@ -33,10 +33,14 @@ class UserController extends Response {
     let statusCode, data;
 
     try {
-      data = await dbHandler.getProfileByUrl(url);
+      const results =  await dbHandler.getProfileByUrl(url);
+      if(results === null) {
+          throw new Error('No user found');
+      }
+      data = {err: false, msg: results};
       statusCode = this.statusCode['success'];
     } catch(e) {
-      data = await dbHandler.getProfileByUrl(url);
+      data = {err: true, msg: 'Failed'};
       statusCode = this.statusCode['not found'];
     }
 
