@@ -171,6 +171,14 @@ class ProjectController extends Response {
       if(ensureDraft.length !== 1) {
           throw new Error('Not valid number of projects');
       }
+      delete req.body.project.paid;
+      delete req.body.project._id;
+      delete req.body.project.nonprofitId;
+      delete req.body.project.totalCost;
+      delete req.body.project.developerCost;
+      delete req.body.project.matched;
+      delete req.body.project.isCompleted;
+
       project = await dbHandler.updateById(req.params.id, {...req.body.project});
 
       data = jwt.generate(req.userToken);
@@ -236,7 +244,7 @@ class ProjectController extends Response {
         });
         if(charge.paid) {
           data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
-          const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false });
+          const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false, totalCost: req.body.price });
           const newCustomer = await user.updateUserIsCustomer(req.body.id.sanitize(), customer.id);
           await chargeHandle.add({cost: Math.floor((+req.body.price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customer.id, projectId: req.body.projectId});
           if(newCustomer) {
@@ -493,10 +501,10 @@ class ProjectController extends Response {
             currency: 'usd',
             destination: customer.id,
           });
-          const ourPay = await stripe.payouts.create({
-            amount: priceToUs,
-            currency: "usd",
-          });
+          // const ourPay = await stripe.payouts.create({
+          //   amount: priceToUs,
+          //   currency: "usd",
+          // });
           project.paid = true;
           await project.save();
           data = {err: false, msg: 'You should receive payment soon!'};
