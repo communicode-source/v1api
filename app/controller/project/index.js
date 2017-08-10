@@ -75,6 +75,24 @@ class ProjectController extends Response {
     return new Response(data, statusCode);
   }
 
+  async feed(req, res) {
+    const dbHandler = new ProjectHandler();
+    const activity = new ActivityFeedHandler();
+
+    let data, statusCode;
+
+    try {
+      data = await dbHandler.population({potential: null}, {path: 'nonprofitId', select: '-password -providerid -provider -totalCost'});
+      data.msg = jwt.generate(req.userToken);
+      statusCode = this.statusCode['success'];
+    } catch(err) {
+      console.log(err);
+      statusCode = this.statusCode['not found'];
+    }
+
+    return new Response(data, statusCode);
+  }
+
   async findProject(req, res) {
     const dbHandler = new ProjectHandler();
     const id = req.params.id;

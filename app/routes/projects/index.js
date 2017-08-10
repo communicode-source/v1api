@@ -20,10 +20,10 @@ router.route('/')
     res.status(response.getStatusCode()).json(response.getJSONData());
   });
 
-router.route('/all')
+router.route('/feed')
 
 .post( requireLogin, async (req, res) => {
-  const response = await controller.index(req, res);
+  const response = await controller.feed(req, res);
 
   res.status(response.getStatusCode()).json(response.getJSONData());
 });
