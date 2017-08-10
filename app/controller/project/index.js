@@ -181,6 +181,7 @@ class ProjectController extends Response {
       delete req.body.project.developerCost;
       delete req.body.project.matched;
       delete req.body.project.isCompleted;
+      delete req.body.project.potential;
 
       project = await dbHandler.updateById(req.params.id, {...req.body.project});
 
@@ -233,8 +234,9 @@ class ProjectController extends Response {
     try {
 
       const customerInfo = await user.isUserCustomer(req.userToken._id);
-
-      let price = (prices[req.body.type] / 0.901).toFixed(2);
+      let dbProject = await dbHandler.find({_id: req.body.projectId, nonprofitId: req.userToken._id});
+      dbProject = dbProject[0];
+      let price = (prices[dbProject.type] / 0.901).toFixed(2);
 
       if(!customerInfo.customer.isCustomer) {
         const customer = await stripe.customers.create({
@@ -249,9 +251,9 @@ class ProjectController extends Response {
         });
         if(charge.paid) {
           data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
-          const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false, totalCost: price });
-          const newCustomer = await user.updateUserIsCustomer(req.body.id.sanitize(), customer.id);
-          await chargeHandle.add({cost: Math.floor((price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customer.id, projectId: req.body.projectId});
+          const chargeId = await chargeHandle.add({cost: Math.floor((price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customer.id, projectId: req.body.projectId});
+          const project = await dbHandler.updateByIds(req.body.projectId.sanitize(), req.userToken._id, { isActive: true, isDraft: false, totalCost: chargeId._id });
+          const newCustomer = await user.updateUserIsCustomer(req.userToken._id.sanitize(), customer.id);
           if(newCustomer) {
             statusCode = 200;
           } else {
@@ -269,9 +271,9 @@ class ProjectController extends Response {
             currency: "USD",
             customer: customerInfo.customer.customerId
         });
-        await chargeHandle.add({cost: Math.floor((price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customerInfo.customer.customerId, projectId: req.body.projectId});
+        const chargeId = await chargeHandle.add({cost: Math.floor((price * 100)), chargeId: charge.id, nonprofitId: req.userToken._id, nonprofitStripeAccount: customerInfo.customer.customerId, projectId: req.body.projectId});
         if(charge.paid) {
-          const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false });
+          const project = await dbHandler.updateById(req.body.projectId.sanitize(), { isActive: true, isDraft: false, totalCost: chargeId._id });
           data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
           if(data) {
             statusCode = 200;
@@ -285,7 +287,6 @@ class ProjectController extends Response {
       }
 
     } catch(err) {
-      console.log(err);
       data = jwt.generate(LoginDataPull(await user.find({_id: req.body.id.sanitize()})));
       statusCode = this.statusCode['not found'];
     }

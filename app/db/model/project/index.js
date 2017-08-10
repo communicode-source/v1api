@@ -13,7 +13,7 @@ var Project = mongoose.Schema({
   startTime: String,
   endTime: String,
   developerCost: {type: Number, default: 0},
-  totalCost: {type: Number, default: 0},
+  totalCost: {type: mongoose.Schema.Types.ObjectId, default: null, ref: "Charge"},
   paid: {type: Boolean, default: false},
   matched: {type: Boolean, default: false},
   confirmed: {type: Boolean, default: false},

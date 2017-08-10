@@ -36,6 +36,10 @@ class ProjectHandler {
   updateById(id, project) {
     return Project.update({"_id": id}, { $set: project }).exec();
   }
+  
+  updateByIds(id, npId, project) {
+    return Project.update({"_id": id, "nonprofitId": npId}, { $set: project }).exec();
+  }
 
   /**
    * find()
