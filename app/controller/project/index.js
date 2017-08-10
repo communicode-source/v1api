@@ -17,6 +17,11 @@ const stripe = require('stripe')('sk_test_v6YuHnfOi5QjZlIORYJDyUq6');
 stripe.setApiVersion('2017-06-05');
 
 class ProjectController extends Response {
+  constructor() {
+    super();
+    console.log('constructor');
+    this.payouts = [];
+  }
 
   async findFinProject(req, res) {
       const dbHandler = new ProjectHandler();
@@ -480,9 +485,6 @@ class ProjectController extends Response {
       const matchHandle = new MatchHandler();
       let data, statusCode = 200;
       try {
-        if(req.userToken.accountType !== true) {
-            throw new Error('Invalid account type');
-        }
         const matches = await matchHandle.find({projectId: id, nonprofitId: req.userToken._id});
         const project = await dbHandler.find({_id: id, nonprofitId: req.userToken._id, confirmed: false});
         if(matches.length !== 1 || project.length !== 1) {
@@ -511,20 +513,30 @@ class ProjectController extends Response {
   }
 
   async payDev(req, res) {
+      if(this.payouts.indexOf(req.userToken._id) !== -1) {
+          console.log('Someone is attempting multiple payouts');
+          return new Response({err: true, msg: 'Already paying out'}, 200);
+      }
+      this.payouts.push(req.userToken._id);
       const dbHandler = new ProjectHandler();
       const chargeHandle = new ChargeHandler();
       const user = new UserHandler();
       let data, statusCode = 200;
-      let customer;
+      let customer, project;
       try {
           if(req.userToken.accountType !== false) {
               throw new Error('User not a dev');
           }
-          let chargeOp = await chargeHandle.find({projectId: req.body.id});
-          let project = await dbHandler.find({_id: req.body.id, potential: req.userToken._id, isCompleted: true, paid: false});
+          let chargeOp = await chargeHandle.find({projectId: req.body.id, devId: null});
+          let prevCharge = await chargeHandle.find({projectId: req.body.id, devId: req.userToken._id});
+          if(prevCharge.length !== 0) {
+              throw new Error('Already Paid');
+          }
+          project = await dbHandler.find({_id: req.body.id, potential: req.userToken._id, isCompleted: true, paid: false});
           if(chargeOp.length !== 1 || project.length !== 1) {
               throw new Error(chargeOp.length + ' or ' + project.length + ' is not right');
           }
+          project = project[0];
           let customerInfo = await user.addQuery({_id: req.userToken._id, 'customer.isCustomer': true}).readUsers();
           if(customerInfo.length !== 1) {
               throw new Error('Invalid quantity of users');
@@ -532,30 +544,32 @@ class ProjectController extends Response {
           customerInfo = customerInfo[0];
           customer = {id: customerInfo.customer.customerId};
           chargeOp = chargeOp[0];
-          project = project[0];
           if(!chargeOp.cost) {
               throw new Error('Volunteer project, not a paid project');
           }
           const priceToDev = Math.floor((+chargeOp.cost * .901));
           const priceToUs = Math.floor((+chargeOp.cost * .07) - 60); // our cut minus the 30 + 25 cents for transaction fees. (5 cent buffer)
-
           const payout = await stripe.transfers.create({
             amount: priceToDev,
             currency: 'usd',
             destination: customer.id,
           });
+          project.paid === true;
+          project = await project.save();
+          data = await chargeHandle.insertD({devId: req.userToken._id, chargeId: payout.id, projectId: req.body.id, cost: priceToDev});
           // const ourPay = await stripe.payouts.create({
           //   amount: priceToUs,
           //   currency: "usd",
           // });
-          project.paid = true;
-          await project.save();
+
           data = {err: false, msg: 'You should receive payment soon!'};
       }
       catch(e) {
           console.log(e);
           data = {err: true, msg: 'Failed'};
       }
+      const index = this.payouts.indexOf(req.userToken._id);
+      this.payouts.splice(index, 0);
       return new Response(data, statusCode);
   }
 

@@ -20,6 +20,13 @@ class ChargesHandler {
         }
         return new Charge(record).save();
     }
+    insertD(record) {
+        const {cost, chargeId, devId, projectId} = record;
+        if(!cost || !chargeId || !devId || !projectId) {
+            throw new Error('Required fields missing');
+        }
+        return new Charge({...record, purpose: 'payout'}).save();
+    }
 }
 
 module.exports = ChargesHandler;
