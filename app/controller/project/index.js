@@ -11,6 +11,7 @@ import MatchHandler from './../../db/handler/match';
 import {LoginDataPull} from './../../utils/validations';
 
 import prices from './../../config/prices';
+import sendEmail from './../../utils/email';
 
 const stripe = require('stripe')('sk_test_v6YuHnfOi5QjZlIORYJDyUq6');
 stripe.setApiVersion('2017-06-05');
@@ -343,19 +344,38 @@ class ProjectController extends Response {
       if(req.userToken.accountType !== false) {
           throw new Error('incorrect user type');
       }
+
       const project = await dbHandler.find({_id: req.body.id, isActive: true, isDraft: false, matched: false});
+
       if(project.length !== 1) {
           throw new Error('incorrect number of projects');
       }
+
       const alMatched = await matchHandle.find({projectId: project[0]._id});
       if(alMatched.length !== 0) {
           throw new Error('incorrect number of matches');
       }
-      await matchHandle.add({developerId: req.userToken._id, nonprofitId: project[0].nonprofitId, projectId: project[0]._id});
+      const newMatch = await matchHandle.add({developerId: req.userToken._id, nonprofitId: project[0].nonprofitId, projectId: project[0]._id});
+      const fullMatch = await matchHandle.findById(newMatch._id);
       project[0].matched = true;
       project[0].potential = req.userToken._id;
       project[0].save();
-      data = {err: false, msg: 'Success'};
+
+      data = { err: false, msg: 'Success!' };
+
+      process.nextTick(async () => {
+        const sendMail = await sendEmail(fullMatch[0].nonprofitId.email, {
+          from:"contact@communicode.co",
+          subject: "We found a match",
+          templateId: "782e1083-75d5-4228-b0db-c014f6651442"
+        }, {
+          '-nonprofit_name-': fullMatch[0].nonprofitId.organizationname,
+          '-developer_name-': fullMatch[0].developerId.fname + ' ' + fullMatch[0].developerId.lname,
+          '-profile_url-': fullMatch[0].developerId.url,
+          '-project_name-': fullMatch[0].projectId.title,
+          '-nonprofit_profile_url-': fullMatch[0].nonprofitId.url
+        });
+      });
     }
     catch(e) {
         console.log(e);

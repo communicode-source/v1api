@@ -16,6 +16,9 @@ class MatchHandler {
     findByNonprofit(id) {
         return Match.find({nonprofitId: id}).exec();
     }
+    findById(id) {
+        return Match.find({_id: id}).populate('nonprofitId').populate('developerId').populate('projectId').exec();
+    }
     find(query) {
         return Match.find(query).exec();
     }
