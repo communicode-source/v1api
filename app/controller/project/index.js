@@ -529,7 +529,6 @@ class ProjectController extends Response {
 
   async payDev(req, res) {
       if(this.payouts.indexOf(req.userToken._id) !== -1) {
-          console.log('Someone is attempting multiple payouts');
           return new Response({err: true, msg: 'Already paying out'}, 200);
       }
       this.payouts.push(req.userToken._id);
@@ -544,12 +543,14 @@ class ProjectController extends Response {
           }
           let chargeOp = await chargeHandle.find({projectId: req.body.id, devId: null});
           let prevCharge = await chargeHandle.find({projectId: req.body.id, devId: req.userToken._id});
-          if(prevCharge.length !== 0) {
-              throw new Error('Already Paid');
-          }
           project = await dbHandler.find({_id: req.body.id, potential: req.userToken._id, isCompleted: true, paid: false});
           if(chargeOp.length !== 1 || project.length !== 1) {
               throw new Error(chargeOp.length + ' or ' + project.length + ' is not right');
+          }
+          if(prevCharge.length !== 0) {
+            project.paid === true;
+            await project.save();
+            throw new Error('Already Paid');
           }
           project = project[0];
           let customerInfo = await user.addQuery({_id: req.userToken._id, 'customer.isCustomer': true}).readUsers();
