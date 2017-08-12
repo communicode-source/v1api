@@ -490,12 +490,27 @@ class ProjectController extends Response {
         if(matches.length !== 1 || project.length !== 1) {
             throw new Error('Improper number of matches or projects made');
         }
+
         if(decision === true) {
             matches[0].isMatched = true;
             project[0].matched = false;
             project[0].confirmed = true;
             await project[0].save();
             await matches[0].save();
+
+            const fullMatch = await matchHandle.findById(newMatch._id);
+            process.nextTick(async () => {
+              const sendMail = await sendEmail(fullMatch[0].developerId.email, {
+                from:"Communicode",
+                subject: "Congratulations!",
+                templateId: "fe39c1b5-40d3-40ea-a9dc-3f181f0b8a92"
+              }, {
+                '-nonprofit_name-': fullMatch[0].nonprofitId.organizationname,
+                '-developer_name-': fullMatch[0].developerId.fname + ' ' + fullMatch[0].developerId.lname,
+                '-nonprofit_email-': fullMatch[0].nonprofitId.email,
+                '-project_name-': fullMatch[0].projectId.title
+              });
+            });
         }
         else {
             matches[0].remove();
