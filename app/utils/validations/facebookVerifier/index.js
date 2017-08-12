@@ -16,7 +16,6 @@ export default (accessToken, AT, email, name, id) => {
       res.on('data', (d) => {
         data = JSON.parse(d);
         if(!data.data || data.data.is_valid !== true || data.data.app_id !== cid.clientID || data.data.user_id !== id) {
-          throw new Error('Data mismatch for facebook')
           return response(false)
         }
         const payName = name.split(" ");
@@ -34,7 +33,6 @@ export default (accessToken, AT, email, name, id) => {
 
 
     }).on('error', (e) => {
-        throw new Error(e)
         return response(false)
     });
   });
