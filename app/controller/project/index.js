@@ -492,6 +492,7 @@ class ProjectController extends Response {
         }
 
         if(decision === true) {
+            console.log('Decision was true!');
             matches[0].isMatched = true;
             project[0].matched = false;
             project[0].confirmed = true;
