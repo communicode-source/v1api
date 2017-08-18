@@ -29,6 +29,12 @@ class MatchHandler {
         }
         return new Match(record).save();
     }
+    saveMatch(project, userToken) {
+      project.matched = true;
+      project.potential = userToken;
+
+      return project.save();
+    }
 }
 
 module.exports = MatchHandler;
