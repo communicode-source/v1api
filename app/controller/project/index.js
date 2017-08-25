@@ -19,7 +19,6 @@ stripe.setApiVersion('2017-06-05');
 class ProjectController extends Response {
   constructor() {
     super();
-    console.log('constructor');
     this.payouts = [];
   }
 
@@ -52,7 +51,7 @@ class ProjectController extends Response {
           if(req.userToken.accontType === true) {
               throw new Error('You are not permitted to access this (developers only)');
           }
-          const projects = await dbHandler.find({potential: req.userToken._id});
+          const projects = await dbHandler.findDescending({potential: req.userToken._id});
           data = {err: false, msg: projects};
       }
       catch(e) {
@@ -87,7 +86,7 @@ class ProjectController extends Response {
     let data, statusCode;
 
     try {
-      data = await dbHandler.population({potential: null}, {path: 'nonprofitId', select: '-password -providerid -provider -totalCost'});
+      data = await dbHandler.feed({potential: null}, {path: 'nonprofitId', select: '-password -providerid -provider -totalCost'});
       data.msg = jwt.generate(req.userToken);
       statusCode = this.statusCode['success'];
     } catch(err) {
@@ -501,8 +500,9 @@ class ProjectController extends Response {
 
             const fullMatch = await matchHandle.findById(newMatch._id);
             process.nextTick(async () => {
+              console.log("???");
               const sendMail = await sendEmail(fullMatch[0].developerId.email, {
-                from:"Communicode",
+                from:"contact@communicode.co",
                 subject: "Congratulations!",
                 templateId: "fe39c1b5-40d3-40ea-a9dc-3f181f0b8a92"
               }, {

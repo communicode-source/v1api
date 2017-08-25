@@ -19,11 +19,19 @@ class ProjectHandler {
    * Returns project from collection by _id
   **/
   findById(id) {
-    return Project.findById(id).exec();
+      return Project.findById(id).exec();
   }
 
   population(query, population) {
       return Project.find(query).populate(population).exec();
+  }
+
+  feed(query, population) {
+      return Project.find(query).populate(population).sort({createdAt: -1}).exec();
+  }
+
+  findDescending(query) {
+      return Project.find(query).sort({createdAt: -1}).exec();
   }
 
   create(project) {
@@ -36,7 +44,7 @@ class ProjectHandler {
   updateById(id, project) {
     return Project.update({"_id": id}, { $set: project }).exec();
   }
-  
+
   updateByIds(id, npId, project) {
     return Project.update({"_id": id, "nonprofitId": npId}, { $set: project }).exec();
   }
