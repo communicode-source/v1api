@@ -378,11 +378,14 @@ class ProjectController extends Response {
       if(alMatched.length !== 0) {
           throw new Error('incorrect number of matches');
       }
+
       const newMatch = await matchHandle.add({developerId: req.userToken._id, nonprofitId: project[0].nonprofitId, projectId: project[0]._id});
       const fullMatch = await matchHandle.findById(newMatch._id);
-      project[0].matched = true;
+
+      const savedMatch = await matchHandle.saveMatch(project[0], req.userToken._id);
+      /*project[0].matched = true;
       project[0].potential = req.userToken._id;
-      project[0].save();
+      project[0].save();*/
 
       data = { err: false, msg: 'Success!' };
 
@@ -496,20 +499,21 @@ class ProjectController extends Response {
             project[0].matched = false;
             project[0].confirmed = true;
             await project[0].save();
-            await matches[0].save();
 
+            const newMatch = await matches[0].save();
             const fullMatch = await matchHandle.findById(newMatch._id);
-            process.nextTick(async () => {
-              console.log("???");
+
+            process.nextTick( async () => {
+              console.log("I am, in fact, being run.");
               const sendMail = await sendEmail(fullMatch[0].developerId.email, {
                 from:"contact@communicode.co",
-                subject: "Congratulations!",
+                subject: "Congratulations! You've got a match!",
                 templateId: "fe39c1b5-40d3-40ea-a9dc-3f181f0b8a92"
               }, {
                 '-nonprofit_name-': fullMatch[0].nonprofitId.organizationname,
                 '-developer_name-': fullMatch[0].developerId.fname + ' ' + fullMatch[0].developerId.lname,
-                '-nonprofit_email-': fullMatch[0].nonprofitId.email,
-                '-project_name-': fullMatch[0].projectId.title
+                '-project_name-': fullMatch[0].projectId.title,
+                '-nonprofit_email-': fullMatch[0].nonprofitId.email
               });
             });
         }
