@@ -541,20 +541,20 @@ class ProjectController extends Response {
       const chargeHandle = new ChargeHandler();
       const user = new UserHandler();
       let data, statusCode = 200;
-      let customer, project;
+      let customer;
       try {
           if(req.userToken.accountType !== false) {
               throw new Error('User not a dev');
           }
           let chargeOp = await chargeHandle.find({projectId: req.body.id, devId: null});
           let prevCharge = await chargeHandle.find({projectId: req.body.id, devId: req.userToken._id});
-          project = await dbHandler.find({_id: req.body.id, potential: req.userToken._id, isCompleted: true, paid: false});
+          let project = await dbHandler.find({_id: req.body.id, potential: req.userToken._id, isCompleted: true, paid: false});
           if(chargeOp.length !== 1 || project.length !== 1) {
               throw new Error(chargeOp.length + ' or ' + project.length + ' is not right');
           }
           if(prevCharge.length !== 0) {
-            project.paid === true;
-            await project.save();
+            project[0].paid = true;
+            await project[0].save();
             throw new Error('Already Paid');
           }
           project = project[0];
@@ -575,7 +575,7 @@ class ProjectController extends Response {
             currency: 'usd',
             destination: customer.id,
           });
-          project.paid === true;
+          project.paid = true;
           project = await project.save();
           data = await chargeHandle.insertD({devId: req.userToken._id, chargeId: payout.id, projectId: req.body.id, cost: priceToDev});
           // const ourPay = await stripe.payouts.create({
