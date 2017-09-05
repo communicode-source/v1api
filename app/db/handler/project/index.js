@@ -31,7 +31,7 @@ class ProjectHandler {
   }
 
   findDescending(query) {
-      return Project.find(query).sort({createdAt: -1}).exec();
+      return Project.find(query).populate('nonprofitId').sort({createdAt: -1}).exec();
   }
 
   create(project) {

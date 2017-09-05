@@ -1,9 +1,9 @@
 'use strict';
 /**
  **/
- var mongoose = require('mongoose');
-const Match       = require('./../../model/match');
-mongoose.Promise     = require('bluebird');
+ var mongoose    = require('mongoose');
+const Match      = require('./../../model/match');
+mongoose.Promise = require('bluebird');
 
 
 class MatchHandler {

@@ -133,7 +133,6 @@ class ProjectController extends Response {
 
   async createProject(req, res) {
     const dbHandler = new ProjectHandler();
-    const activity = new ActivityFeedHandler();
 
     let data, statusCode, pipe, project;
 
@@ -142,12 +141,6 @@ class ProjectController extends Response {
           throw new Error('incorrect user type');
       }
       project = await dbHandler.create({nonprofitId: req.body.sanitized._id, item: req.body.sanitized.item});
-
-      pipe = await activity.addActivity({
-        actor: project.nonprofitId,
-        verb: 'created',
-        object: project._id,
-      });
 
       data = jwt.generate(req.userToken);
       data._id = project._id;
@@ -259,6 +252,10 @@ class ProjectController extends Response {
       let dbProject = await dbHandler.find({_id: req.body.projectId, nonprofitId: req.userToken._id});
       dbProject = dbProject[0];
       let price = (prices[dbProject.type] / 0.901).toFixed(2);
+
+      if(!price) {
+        throw new Error("No Price Associated");
+      }
 
       if(!customerInfo.customer.isCustomer) {
         const customer = await stripe.customers.create({
