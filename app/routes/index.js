@@ -7,21 +7,29 @@ import certifications from './certification';
 import home from './home';
 import jwt from './jwt';
 import projects from './projects';
-import secure from './secure';
-import test from './test';
+import recover from './recover';
 import search from './search';
+import secure from './secure';
+import stripeUser from './stripeuser';
+import test from './test';
 import verify from './verify';
+import connection from './connection';
+import user from './user';
 
 const routes = {
   '/'     : home,
   '/certifications': certifications,
   '/jwt'  : jwt,
   '/projects': projects,
+  '/recover': recover,
   '/secure': secure,
-  '/test' : test,
   '/search' : search,
+  '/stripeuser': stripeUser,
+  '/test' : test,
   '/update': callbacks,
-  '/verify': verify
+  '/verify': verify,
+  '/connection': connection,
+  '/user': user
 }
 
 export default (app) => {

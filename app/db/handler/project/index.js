@@ -1,9 +1,7 @@
 'use strict'
 
-const mongoose       = require('mongoose');
-const Project        = require('./../../model/project');
-mongoose.Promise     = require('bluebird');
-
+import Project from './../../model/project';
+import Bookmark from './../../model/project/bookmark';
 
 class ProjectHandler {
 
@@ -12,7 +10,7 @@ class ProjectHandler {
    * Returns all projects from the projects collection
   **/
   findAll() {
-    return Project.find({}).exec();
+    return Project.find({}).populate('nonprofitId').exec();
   }
 
   /**
@@ -21,7 +19,34 @@ class ProjectHandler {
    * Returns project from collection by _id
   **/
   findById(id) {
-    return Project.findById(id).exec();
+      return Project.findById(id).exec();
+  }
+
+  population(query, population) {
+      return Project.find(query).populate(population).exec();
+  }
+
+  feed(query, population) {
+      return Project.find(query).populate(population).sort({createdAt: -1}).exec();
+  }
+
+  findDescending(query) {
+      return Project.find(query).populate('nonprofitId').sort({createdAt: -1}).exec();
+  }
+
+  create(project) {
+    return new Project({
+      nonprofitId: project.nonprofitId,
+      item: project.item
+    }).save();
+  }
+
+  updateById(id, project) {
+    return Project.update({"_id": id}, { $set: project }).exec();
+  }
+
+  updateByIds(id, npId, project) {
+    return Project.update({"_id": id, "nonprofitId": npId}, { $set: project }).exec();
   }
 
   /**
@@ -31,6 +56,17 @@ class ProjectHandler {
   **/
   find(query) {
     return Project.find(query).exec();
+  }
+
+  getNonprofitFromProject(projectId) {
+    return Project.findById(projectId).exec();
+  }
+
+  bookmark(user, project) {
+    return new Bookmark({
+      userId: user,
+      projectId: project
+    }).save();
   }
 
 }

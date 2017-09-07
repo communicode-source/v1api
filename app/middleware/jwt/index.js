@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
       return false;
     }
     const tk = req.params.token || req.body.token || token;
-    const payload = jwtController.check(tk, req);
+    const payload = jwtController.decode(tk, req);
     if(payload.err === true) {
       req.userToken = false;
       return req.userToken;

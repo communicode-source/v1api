@@ -4,9 +4,9 @@ import jwt from 'jsonwebtoken';
 * Returns the encoded JWT.
 * Depends on jsonwebtoken.
 **/
-export default (json) => {
+export default (json, time) => {
   json.iss    = 'Communicode';
-  json.exp    = expiresIn(15);
+  json.exp    = expiresIn(time);
   return jwt.sign(json, require('./../../config/auth.json').token)
 }
 

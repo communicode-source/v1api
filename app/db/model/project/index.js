@@ -5,11 +5,23 @@ var Project = mongoose.Schema({
   title: String,
   description: String,
   projectType: String,
-  imageUpload: String,
-  types: Array,
+  image: Object,
+  item: String,
+  type: String,
+  interests: Array,
   skills: Array,
-  estimatedTime: String,
-  createdAt: Date
+  startTime: String,
+  endTime: String,
+  developerCost: {type: Number, default: 0},
+  totalCost: {type: mongoose.Schema.Types.ObjectId, default: null, ref: "Charge"},
+  paid: {type: Boolean, default: false},
+  matched: {type: Boolean, default: false},
+  confirmed: {type: Boolean, default: false},
+  potential: {type: mongoose.Schema.Types.ObjectId, ref: "User", default: null},
+  isDraft: { type: Boolean, default: true },
+  isActive: { type: Boolean, default: false },
+  isCompleted: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Project', Project);

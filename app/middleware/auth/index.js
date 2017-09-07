@@ -6,7 +6,7 @@ export const requireLogin = async (req, res, next) => {
     p = req.userToken;
   }
   if(p === false) {
-    return res.status(500).json({err:true, msg: 'User not logged in'});
+    return res.status(401).json({err:true, msg: 'User not logged in'});
   }
 
   next();

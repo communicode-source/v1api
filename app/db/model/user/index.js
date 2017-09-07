@@ -2,7 +2,7 @@ const bcrypt   = require('bcrypt-nodejs');
 const mongoose = require("mongoose");
 
 let User = mongoose.Schema({
-  accounttype      : {type: Boolean, default:     null},
+  accountType      : {type: Boolean, default:     null},
   datejoined       : {type: Date,    default: Date.now},
   email            : {type: String,  required:    true},
   fname            : {type: String,  default:     null},
@@ -13,10 +13,17 @@ let User = mongoose.Schema({
   password         : {type: String,  default:     null},
   provider         : {type: String,  required:    true},
   providerid       : {type: String,  default:     null},
-  skills           : {type: Object,  default:       {}},
+  skills           : {type: Array,   default:     null},
+  biography        : {type: String,  default:     null},
+  education        : {type: String,  default:     null},
+  location         : {type: Array,   default:     null},
+  socials          : {type: Object,  default:     null},
+  job              : {type: String,  default:     null},
   url              : {type: String,  default:     null},
-  urlnum           : {type: Number,  default:     null}
+  customer         : {type: Object, default:     {isCustomer: false, customerId: null}},
+  image            : {type: Object, default:     {avatar: '', cover: ''}}
 });
+
 User.methods.generateHash = function(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
